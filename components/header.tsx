@@ -1,8 +1,8 @@
 import { ModeToggle } from "./ui/toggle";
 
-export function Header(){
+export default function Header(){
     return (
-        <header className="w-full max-w-6xl flex items-center justify-between">
+        <header className="w-full flex items-center justify-between border m-0">
         <div className="flex items-center gap-2">
           <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
           <span className="font-bold tracking-tight text-sm text-foreground/80">

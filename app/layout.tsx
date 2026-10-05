@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { VignetteBackground } from "@/components/vignette-background";
+import { GridBackground } from "@/components/grid-background";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
@@ -36,7 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           enableSystem
           disableTransitionOnChange
         >
-          <VignetteBackground />
+          <GridBackground />
           <div className="relative z-10 flex min-h-screen flex-col">
             {children}
           </div>
