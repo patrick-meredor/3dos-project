@@ -81,6 +81,14 @@
   --sidebar-ring: oklch(0.711 0.019 323.02);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0.008 326);
+
+  /* Vignette & Ambient Radial Background Tokens (Light) */
+  --vignette-start: transparent;
+  --vignette-mid: rgba(15, 23, 42, 0.04);
+  --vignette-edge: rgba(15, 23, 42, 0.16);
+  --bg-radial-center: #ffffff;
+  --bg-radial-mid: #f6f7f9;
+  --bg-radial-edge: #e2e5eb;
 }
 
 .dark {
@@ -115,6 +123,52 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.542 0.034 322.5);
+
+  /* Vignette & Ambient Radial Background Tokens (Dark) */
+  --vignette-start: transparent;
+  --vignette-mid: rgba(0, 0, 0, 0.45);
+  --vignette-edge: rgba(0, 0, 0, 0.92);
+  --bg-radial-center: #1a1a24;
+  --bg-radial-mid: #101015;
+  --bg-radial-edge: #050508;
+}
+
+/* Responsive Vignette Background Utilities */
+.bg-radial-base {
+  background: radial-gradient(
+    ellipse 135% 115% at 50% 45%,
+    var(--bg-radial-center) 0%,
+    var(--bg-radial-mid) 55%,
+    var(--bg-radial-edge) 100%
+  );
+}
+
+.bg-radial-vignette {
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    var(--vignette-start) 35%,
+    var(--vignette-mid) 70%,
+    var(--vignette-edge) 100%
+  );
+}
+
+.vignette-bg {
+  position: relative;
+  background-color: var(--background);
+  background-image: 
+    radial-gradient(
+      ellipse 100% 100% at 50% 50%,
+      var(--vignette-start) 35%,
+      var(--vignette-mid) 70%,
+      var(--vignette-edge) 100%
+    ),
+    radial-gradient(
+      ellipse 135% 115% at 50% 45%,
+      var(--bg-radial-center) 0%,
+      var(--bg-radial-mid) 55%,
+      var(--bg-radial-edge) 100%
+    );
+  background-attachment: fixed;
 }
 
 @layer base {
