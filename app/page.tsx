@@ -4,10 +4,10 @@ import Main from "@/components/main";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-between sm:p-10">
+    <div className="flex min-h-screen flex-col items-center sm:p-5">
       <Header />
       <Main />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

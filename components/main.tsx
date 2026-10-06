@@ -1,7 +1,18 @@
 export default function Main(){
     return (
-        <main>
-            <h1 className="text-9xl font-bold font-serif">It&apos;s not what we do once in a while that shapes our lives. It&apos;s what we do consistently <span>- Tony Robbins</span></h1>
+        <main className="flex-1 w-full flex flex-col justify-end">
+            <div className="flex -space-x-3">
+                <div className="relative z-30 flex h-10 w-10 items-center justify-center rounded-full border-2 border-background bg-[#fa2c7a] text-xs font-bold font-mono text-white shadow-sm">
+                    03
+                </div>
+                <div className="relative z-20 flex h-10 w-10 items-center justify-center rounded-full border-2 border-background bg-[#fa2c7a] text-xs font-bold font-mono text-white shadow-sm">
+                    02
+                </div>
+                <div className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 border-background bg-[#fa2c7a] text-xs font-bold font-mono text-white shadow-sm">
+                    01
+                </div>
+            </div>
+            <h1 className="text-7xl md:text-6xl font-bold font-bernoru leading-[1.1] w-full">It&apos;s not what we do once in a while that shapes our lives. It&apos;s what we do consistently<span className="text-orange-500 dark:invert">.</span></h1>
         </main>
     )
 }

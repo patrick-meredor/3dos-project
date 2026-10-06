@@ -1,19 +1,22 @@
+import { Button } from "./ui/button";
+import Image from "next/image";
 import { ModeToggle } from "./ui/toggle";
+import { Link } from "lucide-react";
 
 export default function Header(){
     return (
-        <header className="w-full flex items-center justify-between border m-0">
+        <header className="w-full flex items-center justify-between py-4">
         <div className="flex items-center gap-2">
-          <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="font-bold tracking-tight text-sm text-foreground/80">
-            DayOne
-          </span>
+          <Image src="/logo_transparent.png" width={40} height={40} alt="Logo" className="dark:invert" />
+          <h1 className="font-bernoru">DAY ONE</h1>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-muted-foreground hidden sm:inline-block">
-            Theme Preview
-          </span>
           <ModeToggle />
+          <Button>
+            <a href="/login">
+              Login
+            </a>
+          </Button>
         </div>
       </header>
     )
