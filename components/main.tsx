@@ -1,4 +1,10 @@
-export default function Main(){
+"use client"
+
+import { useMainQuotes } from "@/hooks/main"
+
+export default function Main() {
+    const { currentQuote } = useMainQuotes()
+
     return (
         <main className="flex-1 w-full flex flex-col justify-end">
             <div className="flex -space-x-3">
@@ -12,7 +18,10 @@ export default function Main(){
                     01
                 </div>
             </div>
-            <h1 className="text-7xl md:text-6xl font-bold font-bernoru leading-[1.1] w-full">It&apos;s not what we do once in a while that shapes our lives. It&apos;s what we do consistently<span className="text-orange-500 dark:invert">.</span></h1>
+            <h1 className="text-7xl md:text-6xl font-bold font-bernoru leading-[1.1] w-full transition-opacity transition-discrete duration-500 ease-in-out">
+                {currentQuote}
+                <span className="text-orange-500 dark:invert">.</span>
+            </h1>
         </main>
     )
 }
