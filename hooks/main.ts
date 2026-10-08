@@ -1,28 +1,47 @@
 import { useEffect, useState } from 'react'
 
+export interface QuoteAuthor {
+    quote: string
+    author: string
+    image: string
+}
+
+export const quoteItems: QuoteAuthor[] = [
+    {
+        quote: "Similarly we become just by doing just acts, temperate by doing temperate acts, brave by doing brave acts.",
+        author: "Aristotle",
+        image: "/carousel_1.png",
+    },
+    {
+        quote: "The best project you'll ever work on is you. Don't dream about success, get up and work for it.",
+        author: "Dean Graziosi",
+        image: "/carousel_2.png",
+    },
+    {
+        quote: "Do the best you can until you know better. Then when you know better, do better.",
+        author: "Maya Angelou",
+        image: "/carousel_3.png",
+    },
+]
+
 export function useMainQuotes() {
-    const quotes = [
-        "It's not what we do once in a while that shapes our lives. It's what we do consistently",
-        "The only way to do great work is to love what you do",
-        "Success is not final, failure is not fatal: it is the courage to continue that counts",
-        "Believe you can and you're halfway there",
-        "Do not go where the path may lead, go instead where there is no path and leave a trail",
-    ]
     const [currentIndex, setCurrentIndex] = useState(0)
 
     useEffect(() => {
-        // Set up the timer to run every 5000 milliseconds (5 seconds)
+        // Automatically cycle every 6 seconds
         const interval = setInterval(() => {
-            setCurrentIndex((prevIndex) => (prevIndex + 1) % quotes.length)
-        }, 5000)
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % quoteItems.length)
+        }, 6000)
 
-        // Cleanup the interval when the component unmounts
         return () => clearInterval(interval)
-    }, [quotes.length])
+    }, [])
 
     return {
-        currentQuote: quotes[currentIndex],
+        currentQuote: quoteItems[currentIndex].quote,
+        currentAuthor: quoteItems[currentIndex].author,
         currentIndex,
-        quotes,
+        setCurrentIndex,
+        quotes: quoteItems.map((item) => item.quote),
+        items: quoteItems,
     }
 }
