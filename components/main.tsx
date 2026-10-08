@@ -52,7 +52,7 @@ export default function Main() {
             </div>
 
             {/* Rotating Quotes */}
-            <div className="grid grid-cols-1 items-start min-h-[140px] sm:min-h-[180px]">
+            <div className="grid grid-cols-1 items-start min-h-35 sm:min-h-45">
                 {items.map((item, idx) => (
                     <div
                         key={idx}
