@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Signika } from "next/font/google";
 import localFont from 'next/font/local';
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -12,7 +12,15 @@ const bernoru = localFont({
   display: 'swap',
 });
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const signika = Signika({
+  subsets:['latin'],
+  variable:'--font-signika',
+});
+
+const inter = Inter({
+  subsets:['latin'],
+  variable:'--font-sans',
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,8 +33,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "3dos",
-  description: "3dos keep doing good everyday.",
+  title: "Day One",
+  description: "Day One. Stay Consistent. Be Strong.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -34,7 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable, bernoru.variable)}
+      className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable, bernoru.variable, signika.variable)}
     >
       <body className="min-h-full flex flex-col relative selection:bg-primary/10">
         <ThemeProvider 

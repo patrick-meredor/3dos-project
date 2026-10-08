@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 
 export default function Header(){
     return (
-        <header className="w-full flex items-center justify-between py-4 px-4 fixed">
+        <header className="fixed top-0 left-0 right-0 z-50 w-full flex items-center justify-between px-6 py-4 bg-background/30 backdrop-blur-xl border-b border-white/10 shadow-sm">
         <div className="flex items-center gap-2">
           <Image src="/logo_transparent.png" width={40} height={40} alt="Logo" className="dark:invert" />
           <h1 className="font-bernoru">DAY ONE</h1>
         </div>
         <div className="flex items-center gap-3">
           <ModeToggle />
-          <nav className="flex items-center gap-3">
+          <nav className="flex items-center gap-3 font-signika">
             <Link href="/roadmap" className="flex items-center gap-2 transition-colors"><Map className="h-5 w-5"/>Roadmap</Link>
             <Button variant="default" size="lg" nativeButton={false} render={<Link href="/login" />}>
               Login
