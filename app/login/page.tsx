@@ -21,7 +21,7 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="relative hidden bg-muted/40 lg:flex items-center justify-center border-l p-12">
+      <div className="relative hidden bg-muted lg:flex items-center justify-center border-l p-12">
         <div className="max-w-md text-center space-y-4">
           <div className="flex justify-center mb-4">
             <Image
