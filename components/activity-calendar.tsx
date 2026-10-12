@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { getLocalDateString } from "@/lib/habits"
 import type { HabitItem } from "@/app/habits/action"
 
 interface ActivityCalendarProps {
@@ -41,7 +42,7 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
 
   // Current real date
   const now = useMemo(() => new Date(), [])
-  const todayStr = useMemo(() => now.toISOString().split("T")[0], [now])
+  const todayStr = useMemo(() => getLocalDateString(now), [now])
 
   const year = viewDate.getFullYear()
   const month = viewDate.getMonth()

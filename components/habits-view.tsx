@@ -25,7 +25,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { calculateStreak } from "@/lib/habits"
+import { calculateStreak, getLocalDateString } from "@/lib/habits"
 import {
   addHabit,
   toggleHabitToday,
@@ -123,7 +123,7 @@ create policy "Users can manage their own habits"
   // Handle Toggle Today
   const handleToggleToday = (habit: HabitItem) => {
     const nextStatus = !habit.completed_today
-    const todayStr = new Date().toISOString().split('T')[0]
+    const todayStr = getLocalDateString()
 
     let updatedDates = [...habit.completed_dates]
     if (nextStatus) {
@@ -221,7 +221,7 @@ create policy "Users can manage their own habits"
       d.setDate(d.getDate() - i)
       days.push({
         dayName: d.toLocaleDateString("en-US", { weekday: "narrow" }),
-        dateStr: d.toISOString().split("T")[0],
+        dateStr: getLocalDateString(d),
         isToday: i === 0,
       })
     }

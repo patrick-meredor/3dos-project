@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/server'
-import { calculateStreak, generatePastDates } from '@/lib/habits'
+import { calculateStreak, generatePastDates, getLocalDateString } from '@/lib/habits'
 
 export interface HabitItem {
   id: string
@@ -78,7 +78,7 @@ export async function getHabits(): Promise<{
     return { habits: [], error: error.message }
   }
 
-  const todayStr = new Date().toISOString().split('T')[0]
+  const todayStr = getLocalDateString()
 
   const mapped: HabitItem[] = (data || []).map((row: any) => {
     const rawDates = row.completed_dates
@@ -189,7 +189,7 @@ export async function toggleHabitToday(
   }
 
   const nextStatus = !currentStatus
-  const todayStr = new Date().toISOString().split('T')[0]
+  const todayStr = getLocalDateString()
 
   let updatedDates = [...currentDates]
   if (nextStatus) {

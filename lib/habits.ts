@@ -16,11 +16,11 @@ export function calculateStreak(completedDates: string[], fallbackStreak: number
 
   const datesSet = new Set(completedDates)
   const today = new Date()
-  const todayStr = today.toISOString().split('T')[0]
+  const todayStr = getLocalDateString(today)
 
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
-  const yesterdayStr = yesterday.toISOString().split('T')[0]
+  const yesterdayStr = getLocalDateString(yesterday)
 
   const isCompletedToday = datesSet.has(todayStr)
   const isCompletedYesterday = datesSet.has(yesterdayStr)
@@ -33,7 +33,7 @@ export function calculateStreak(completedDates: string[], fallbackStreak: number
   let streak = 0
   const checkDate = new Date(isCompletedToday ? today : yesterday)
 
-  while (datesSet.has(checkDate.toISOString().split('T')[0])) {
+  while (datesSet.has(getLocalDateString(checkDate))) {
     streak++
     checkDate.setDate(checkDate.getDate() - 1)
   }
@@ -51,7 +51,15 @@ export function generatePastDates(days: number, includeToday: boolean): string[]
   for (let i = startOffset; i < days + startOffset; i++) {
     const d = new Date(today)
     d.setDate(d.getDate() - i)
-    dates.push(d.toISOString().split('T')[0])
+    dates.push(getLocalDateString(d))
   }
   return dates
 }
+
+export function getLocalDateString(date: Date = new Date()): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
