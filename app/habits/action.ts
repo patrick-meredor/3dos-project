@@ -157,6 +157,7 @@ export async function addHabit(data: {
   revalidatePath('/habits')
   revalidatePath('/dashboard')
   revalidatePath('/todos')
+  revalidatePath('/calendar')
   return {
     success: true,
     habit: {
@@ -216,6 +217,7 @@ export async function toggleHabitToday(
   revalidatePath('/habits')
   revalidatePath('/dashboard')
   revalidatePath('/todos')
+  revalidatePath('/calendar')
   return { success: true }
 }
 
@@ -242,6 +244,7 @@ export async function deleteHabit(id: string): Promise<{ success: boolean; error
   revalidatePath('/habits')
   revalidatePath('/dashboard')
   revalidatePath('/todos')
+  revalidatePath('/calendar')
   return { success: true }
 }
 
@@ -275,5 +278,6 @@ export async function updateHabit(
   revalidatePath('/habits')
   revalidatePath('/dashboard')
   revalidatePath('/todos')
+  revalidatePath('/calendar')
   return { success: true }
 }

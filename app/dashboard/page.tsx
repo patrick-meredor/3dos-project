@@ -17,7 +17,8 @@ import {
   Plus,
 } from "lucide-react"
 import Link from "next/link"
-import { ActivityCalendar } from "@/components/activity-calendar"
+import { cn } from "@/lib/utils"
+import { formatTodoDate } from "@/lib/todos"
 
 function getDayOfYear(date: Date): number {
   const startOfYear = new Date(date.getFullYear(), 0, 0)
@@ -282,12 +283,16 @@ export default async function DashboardPage() {
               <span>Explore Roadmap</span>
               <span>&rarr;</span>
             </Link>
+            <Link
+              href="/calendar"
+              className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center justify-between"
+            >
+              <span>Activity Calendar</span>
+              <span>&rarr;</span>
+            </Link>
           </div>
         </div>
       </div>
-
-      {/* 6. Calendar / History: "Have I actually been consistent?" */}
-      <ActivityCalendar habits={habits} />
 
       {/* Live Overview: Habits & Todos Breakdown */}
       <div className="grid gap-6 md:grid-cols-2">
@@ -394,36 +399,56 @@ export default async function DashboardPage() {
               </div>
             ) : (
               <div className="space-y-2.5">
-                {todos.slice(0, 4).map((t) => (
-                  <div
-                    key={t.id}
-                    className="flex items-center justify-between p-3 rounded-lg border bg-background/50 hover:bg-background/80 transition-colors"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      {t.is_completed ? (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                      ) : (
-                        <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
-                      )}
-                      <span
-                        className={`text-sm truncate ${
-                          t.is_completed ? "line-through text-muted-foreground" : "font-medium text-foreground"
-                        }`}
-                      >
-                        {t.title}
-                      </span>
-                    </div>
-                    <span
-                      className={`text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full ${
-                        t.is_completed
-                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                          : "bg-muted text-muted-foreground"
-                      }`}
+                {todos.slice(0, 4).map((t) => {
+                  const dateInfo = formatTodoDate(t.due_date || t.created_at)
+                  return (
+                    <div
+                      key={t.id}
+                      className="flex items-center justify-between p-3 rounded-lg border bg-background/50 hover:bg-background/80 transition-colors"
                     >
-                      {t.is_completed ? "Done" : "To Do"}
-                    </span>
-                  </div>
-                ))}
+                      <div className="flex items-center gap-3 min-w-0">
+                        {t.is_completed ? (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                        ) : (
+                          <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
+                        )}
+                        <span
+                          className={`text-sm truncate ${
+                            t.is_completed ? "line-through text-muted-foreground" : "font-medium text-foreground"
+                          }`}
+                        >
+                          {t.title}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {dateInfo.label && (
+                          <span
+                            className={cn(
+                              "text-[10px] font-mono px-1.5 py-0.5 rounded flex items-center gap-1",
+                              dateInfo.isToday
+                                ? "bg-primary/10 text-primary font-medium"
+                                : dateInfo.isPast && !t.is_completed
+                                ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium"
+                                : "text-muted-foreground"
+                            )}
+                          >
+                            <Calendar className="h-2.5 w-2.5" />
+                            {dateInfo.label}
+                          </span>
+                        )}
+                        <span
+                          className={`text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full ${
+                            t.is_completed
+                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {t.is_completed ? "Done" : "To Do"}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>

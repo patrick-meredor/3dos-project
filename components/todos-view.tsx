@@ -14,11 +14,13 @@ import {
   Sparkles,
   Database,
   Copy,
-  CheckCheck
+  CheckCheck,
+  Calendar
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { formatTodoDate } from "@/lib/todos"
 import { addTodo, updateTodo, deleteTodo, type TodoItem } from "@/app/todos/action"
 
 interface TodosViewProps {
@@ -30,8 +32,10 @@ interface TodosViewProps {
 export function TodosView({ initialTodos, tableMissing = false, dbError }: TodosViewProps) {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
   const [newTitle, setNewTitle] = useState("")
+  const [newDueDate, setNewDueDate] = useState(() => new Date().toISOString().split("T")[0])
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState("")
+  const [editDueDate, setEditDueDate] = useState("")
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all")
   const [copiedSql, setCopiedSql] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -43,8 +47,12 @@ create table if not exists public.todos (
   user_id uuid references auth.users(id) on delete cascade not null default auth.uid(),
   title text not null,
   is_completed boolean default false not null,
+  due_date date default current_date not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
+
+-- If you already created public.todos, run this line:
+alter table public.todos add column if not exists due_date date default current_date;
 
 alter table public.todos enable row level security;
 
@@ -66,6 +74,7 @@ create policy "Users can manage their own todos"
 
     const tempId = `temp-${Date.now()}`
     const titleToAdd = newTitle.trim()
+    const dateToAdd = newDueDate || new Date().toISOString().split("T")[0]
     setNewTitle("")
     setActionError(null)
 
@@ -75,12 +84,13 @@ create policy "Users can manage their own todos"
       user_id: "",
       title: titleToAdd,
       is_completed: false,
+      due_date: dateToAdd,
       created_at: new Date().toISOString(),
     }
     setTodos((prev) => [optimisticTodo, ...prev])
 
     startTransition(async () => {
-      const res = await addTodo(titleToAdd)
+      const res = await addTodo(titleToAdd, dateToAdd)
       if (!res.success) {
         setActionError(res.error || "Failed to create task.")
         // Rollback
@@ -118,6 +128,7 @@ create policy "Users can manage their own todos"
   const startEdit = (todo: TodoItem) => {
     setEditingId(todo.id)
     setEditTitle(todo.title)
+    setEditDueDate(todo.due_date || (todo.created_at ? todo.created_at.split("T")[0] : ""))
   }
 
   // Save Edit
@@ -128,16 +139,19 @@ create policy "Users can manage their own todos"
     }
 
     const updatedTitle = editTitle.trim()
+    const updatedDueDate = editDueDate || undefined
     const original = todos.find((t) => t.id === id)
     setEditingId(null)
 
     // Optimistic update
     setTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, title: updatedTitle } : t))
+      prev.map((t) =>
+        t.id === id ? { ...t, title: updatedTitle, due_date: updatedDueDate } : t
+      )
     )
 
     startTransition(async () => {
-      const res = await updateTodo(id, { title: updatedTitle })
+      const res = await updateTodo(id, { title: updatedTitle, due_date: updatedDueDate })
       if (!res.success) {
         setActionError(res.error || "Failed to update title.")
         if (original) {
@@ -244,18 +258,31 @@ create policy "Users can manage their own todos"
       </div>
 
       {/* Add Todo Bar */}
-      <form onSubmit={handleAdd} className="flex gap-2">
+      <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-2">
         <Input
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="Add a new habit or task (e.g. 30m Deep Work, Morning Walk)..."
+          placeholder="Add a new task (e.g. 30m Deep Work, Morning Walk)..."
           className="flex-1 h-10 px-3.5 text-sm"
           disabled={isPending}
         />
-        <Button type="submit" disabled={isPending || !newTitle.trim()} className="gap-1.5 h-10 px-4 shrink-0">
-          {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-          <span>Add Todo</span>
-        </Button>
+        <div className="flex gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 px-3 rounded-lg border bg-background/50 h-10">
+            <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+            <input
+              type="date"
+              value={newDueDate}
+              onChange={(e) => setNewDueDate(e.target.value)}
+              className="bg-transparent text-xs font-mono outline-none text-foreground cursor-pointer"
+              disabled={isPending}
+              title="Target Date"
+            />
+          </div>
+          <Button type="submit" disabled={isPending || !newTitle.trim()} className="gap-1.5 h-10 px-4 shrink-0">
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+            <span>Add Todo</span>
+          </Button>
+        </div>
       </form>
 
       {/* Filter Tabs */}
@@ -317,6 +344,7 @@ create policy "Users can manage their own todos"
         ) : (
           filteredTodos.map((todo) => {
             const isEditing = editingId === todo.id
+            const dateInfo = formatTodoDate(todo.due_date || todo.created_at)
 
             return (
               <div
@@ -326,7 +354,7 @@ create policy "Users can manage their own todos"
                   todo.is_completed && "opacity-75 bg-muted/40"
                 )}
               >
-                {/* Checkbox & Title */}
+                {/* Checkbox & Title & Date */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <button
                     type="button"
@@ -342,7 +370,7 @@ create policy "Users can manage their own todos"
                   </button>
 
                   {isEditing ? (
-                    <div className="flex items-center gap-1.5 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5 flex-1">
                       <Input
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
@@ -351,7 +379,13 @@ create policy "Users can manage their own todos"
                           if (e.key === "Escape") setEditingId(null)
                         }}
                         autoFocus
-                        className="h-8 text-sm flex-1"
+                        className="h-8 text-sm flex-1 min-w-[160px]"
+                      />
+                      <input
+                        type="date"
+                        value={editDueDate}
+                        onChange={(e) => setEditDueDate(e.target.value)}
+                        className="h-8 text-xs font-mono px-2 rounded-lg border bg-background text-foreground"
                       />
                       <Button
                         size="icon-xs"
@@ -371,15 +405,37 @@ create policy "Users can manage their own todos"
                       </Button>
                     </div>
                   ) : (
-                    <span
-                      onClick={() => handleToggle(todo)}
-                      className={cn(
-                        "text-sm font-medium transition-all select-none truncate cursor-pointer",
-                        todo.is_completed && "line-through text-muted-foreground font-normal"
-                      )}
-                    >
-                      {todo.title}
-                    </span>
+                    <div className="flex flex-col min-w-0">
+                      <span
+                        onClick={() => handleToggle(todo)}
+                        className={cn(
+                          "text-sm font-medium transition-all select-none truncate cursor-pointer",
+                          todo.is_completed && "line-through text-muted-foreground font-normal"
+                        )}
+                      >
+                        {todo.title}
+                      </span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span
+                          className={cn(
+                            "inline-flex items-center gap-1 text-[11px] font-mono px-1.5 py-0.2 rounded border",
+                            dateInfo.isToday
+                              ? "bg-primary/10 text-primary border-primary/20 font-semibold"
+                              : dateInfo.isPast && !todo.is_completed
+                              ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                              : "bg-muted/40 text-muted-foreground border-border/40"
+                          )}
+                        >
+                          <Calendar className="h-3 w-3" />
+                          {dateInfo.label}
+                        </span>
+                        {dateInfo.isPast && !todo.is_completed && (
+                          <span className="text-[10px] uppercase font-semibold text-amber-600 dark:text-amber-400">
+                            Overdue
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
 

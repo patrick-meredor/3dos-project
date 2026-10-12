@@ -17,6 +17,7 @@ import {
   List,
   Home,
   LogOut,
+  Calendar,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { HabitItem } from "@/app/habits/action"
@@ -68,6 +69,11 @@ export function AppSidebar({ user, habits = [], ...props }: AppSidebarProps) {
       title: "Todos",
       url: "/todos",
       icon: List,
+    },
+    {
+      title: "Calendar",
+      url: "/calendar",
+      icon: Calendar,
     },
   ]
 
@@ -188,7 +194,7 @@ export function AppSidebar({ user, habits = [], ...props }: AppSidebarProps) {
                     <SidebarMenuItem>
                       <SidebarMenuButton
                         render={<Link href="/habits" />}
-                        size="xs"
+                        size="sm"
                         className="text-muted-foreground hover:text-foreground text-[11px] justify-between px-2"
                       >
                         <span>View all {habits.length} habits</span>
@@ -252,6 +258,10 @@ export function AppSidebar({ user, habits = [], ...props }: AppSidebarProps) {
                 <DropdownMenuItem render={<Link href="/todos" className="flex items-center gap-2 w-full" />}>
                   <List className="size-4" />
                   <span>Todos</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem render={<Link href="/calendar" className="flex items-center gap-2 w-full" />}>
+                  <Calendar className="size-4" />
+                  <span>Calendar</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem render={<Link href="/" className="flex items-center gap-2 w-full" />}>
                   <Home className="size-4" />
