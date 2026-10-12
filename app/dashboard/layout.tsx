@@ -1,11 +1,11 @@
 import { createClient } from "@/lib/server"
 import { redirect } from "next/navigation"
+import { getHabits } from "@/app/habits/action"
 import {
   SidebarProvider,
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,6 +17,7 @@ import {
 import { AppSidebar } from "@/components/app-sidebar"
 import { ModeToggle } from "@/components/ui/toggle"
 import Link from "next/link"
+import { GridBackground } from "@/components/grid-background"
 
 export default async function DashboardLayout({
   children,
@@ -24,9 +25,10 @@ export default async function DashboardLayout({
   children: React.ReactNode
 }) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const [{ data: { user } }, { habits }] = await Promise.all([
+    supabase.auth.getUser(),
+    getHabits(),
+  ])
 
   if (!user) {
     redirect("/login")
@@ -34,12 +36,11 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <AppSidebar user={user} />
+      <AppSidebar user={user} habits={habits} />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between border-b px-4 transition-[width,height] ease-linear">
+        <header className="flex h-16 shrink-0 items-center justify-between px-4 transition-[width,height] ease-linear">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -56,6 +57,7 @@ export default async function DashboardLayout({
             <ModeToggle />
           </div>
         </header>
+        <GridBackground />
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 md:p-8">
           {children}
         </div>
