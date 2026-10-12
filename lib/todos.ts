@@ -2,6 +2,8 @@
  * Helper utilities for formatting and handling Todo dates.
  */
 
+import { getLocalDateString } from "@/lib/habits"
+
 export function formatTodoDate(dateStr?: string): {
   label: string
   isToday: boolean
@@ -20,18 +22,18 @@ export function formatTodoDate(dateStr?: string): {
   }
 
   const today = new Date()
-  const todayStr = today.toISOString().split("T")[0]
+  const todayStr = getLocalDateString(today)
 
   // Extract YYYY-MM-DD whether it is an ISO timestamp or date string
   const dateOnly = dateStr.includes("T") ? dateStr.split("T")[0] : dateStr
 
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
-  const yesterdayStr = yesterday.toISOString().split("T")[0]
+  const yesterdayStr = getLocalDateString(yesterday)
 
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
-  const tomorrowStr = tomorrow.toISOString().split("T")[0]
+  const tomorrowStr = getLocalDateString(tomorrow)
 
   const d = new Date(dateOnly + "T00:00:00")
   const formattedFull = d.toLocaleDateString("en-US", {
@@ -87,3 +89,35 @@ export function formatTodoDate(dateStr?: string): {
     formattedFull,
   }
 }
+
+/**
+ * Formats a Todo's created_at timestamp into a readable date and time string.
+ * Example: "Oct 13, 5:56 AM" or "Oct 13, 2025, 5:56 AM"
+ */
+export function formatTodoCreatedAt(dateStr?: string): string {
+  if (!dateStr) return ""
+  try {
+    const d = new Date(dateStr)
+    if (isNaN(d.getTime())) return ""
+
+    const now = new Date()
+    const isThisYear = d.getFullYear() === now.getFullYear()
+
+    const datePart = d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      ...(isThisYear ? {} : { year: "numeric" }),
+    })
+
+    const timePart = d.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
+
+    return `${datePart}, ${timePart}`
+  } catch {
+    return ""
+  }
+}
+

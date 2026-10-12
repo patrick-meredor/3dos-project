@@ -15,12 +15,14 @@ import {
   Database,
   Copy,
   CheckCheck,
-  Calendar
+  Calendar,
+  Clock
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { formatTodoDate } from "@/lib/todos"
+import { formatTodoDate, formatTodoCreatedAt } from "@/lib/todos"
+import { getLocalDateString } from "@/lib/habits"
 import { addTodo, updateTodo, deleteTodo, type TodoItem } from "@/app/todos/action"
 
 interface TodosViewProps {
@@ -32,7 +34,7 @@ interface TodosViewProps {
 export function TodosView({ initialTodos, tableMissing = false, dbError }: TodosViewProps) {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
   const [newTitle, setNewTitle] = useState("")
-  const [newDueDate, setNewDueDate] = useState(() => new Date().toISOString().split("T")[0])
+  const [newDueDate, setNewDueDate] = useState(() => getLocalDateString())
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState("")
   const [editDueDate, setEditDueDate] = useState("")
@@ -74,7 +76,7 @@ create policy "Users can manage their own todos"
 
     const tempId = `temp-${Date.now()}`
     const titleToAdd = newTitle.trim()
-    const dateToAdd = newDueDate || new Date().toISOString().split("T")[0]
+    const dateToAdd = newDueDate || getLocalDateString()
     setNewTitle("")
     setActionError(null)
 
@@ -106,6 +108,9 @@ create policy "Users can manage their own todos"
 
   // Handle Toggle Completion
   const handleToggle = (todo: TodoItem) => {
+    if (editingId === todo.id) {
+      setEditingId(null)
+    }
     const nextState = !todo.is_completed
     // Optimistic toggle
     setTodos((prev) =>
@@ -126,6 +131,7 @@ create policy "Users can manage their own todos"
 
   // Start Edit
   const startEdit = (todo: TodoItem) => {
+    if (todo.is_completed) return
     setEditingId(todo.id)
     setEditTitle(todo.title)
     setEditDueDate(todo.due_date || (todo.created_at ? todo.created_at.split("T")[0] : ""))
@@ -138,9 +144,14 @@ create policy "Users can manage their own todos"
       return
     }
 
+    const original = todos.find((t) => t.id === id)
+    if (original?.is_completed) {
+      setEditingId(null)
+      return
+    }
+
     const updatedTitle = editTitle.trim()
     const updatedDueDate = editDueDate || undefined
-    const original = todos.find((t) => t.id === id)
     setEditingId(null)
 
     // Optimistic update
@@ -343,7 +354,7 @@ create policy "Users can manage their own todos"
           </div>
         ) : (
           filteredTodos.map((todo) => {
-            const isEditing = editingId === todo.id
+            const isEditing = editingId === todo.id && !todo.is_completed
             const dateInfo = formatTodoDate(todo.due_date || todo.created_at)
 
             return (
@@ -415,10 +426,10 @@ create policy "Users can manage their own todos"
                       >
                         {todo.title}
                       </span>
-                      <div className="flex items-center gap-2 mt-0.5">
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
                         <span
                           className={cn(
-                            "inline-flex items-center gap-1 text-[11px] font-mono px-1.5 py-0.2 rounded border",
+                            "inline-flex items-center gap-1 text-[11px] font-mono px-1.5 py-0.5 rounded border",
                             dateInfo.isToday
                               ? "bg-primary/10 text-primary border-primary/20 font-semibold"
                               : dateInfo.isPast && !todo.is_completed
@@ -434,6 +445,16 @@ create policy "Users can manage their own todos"
                             Overdue
                           </span>
                         )}
+                        {todo.created_at && (
+                          <span
+                            suppressHydrationWarning
+                            className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground/80"
+                            title={`Created on ${formatTodoCreatedAt(todo.created_at)}`}
+                          >
+                            <Clock className="h-3 w-3 text-muted-foreground/60" />
+                            <span>Created {formatTodoCreatedAt(todo.created_at)}</span>
+                          </span>
+                        )}
                       </div>
                     </div>
                   )}
@@ -442,15 +463,17 @@ create policy "Users can manage their own todos"
                 {/* Actions: Edit & Delete */}
                 {!isEditing && (
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
-                      onClick={() => startEdit(todo)}
-                      title="Edit task"
-                      className="size-7 text-muted-foreground hover:text-foreground"
-                    >
-                      <Edit2 className="h-3.5 w-3.5" />
-                    </Button>
+                    {!todo.is_completed && (
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
+                        onClick={() => startEdit(todo)}
+                        title="Edit task"
+                        className="size-7 text-muted-foreground hover:text-foreground"
+                      >
+                        <Edit2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon-xs"

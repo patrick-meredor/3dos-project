@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/server'
+import { getLocalDateString } from '@/lib/habits'
 
 export interface TodoItem {
   id: string
@@ -72,7 +73,7 @@ export async function addTodo(
     return { success: false, error: 'Not authenticated' }
   }
 
-  const targetDate = dueDate || new Date().toISOString().split('T')[0]
+  const targetDate = dueDate || getLocalDateString()
 
   // Try insert with due_date and is_completed
   let { data, error } = await supabase
@@ -136,6 +137,20 @@ export async function updateTodo(
 
   if (!user) {
     return { success: false, error: 'Not authenticated' }
+  }
+
+  // Prevent editing completed todos
+  if (updates.title !== undefined || updates.due_date !== undefined) {
+    const { data: existing } = await supabase
+      .from('todos')
+      .select('is_completed')
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (existing?.is_completed) {
+      return { success: false, error: 'Completed tasks cannot be edited.' }
+    }
   }
 
   const payload: Record<string, any> = {}
