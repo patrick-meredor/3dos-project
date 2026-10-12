@@ -18,7 +18,6 @@ import {
   Repeat,
   HeartHandshake,
   Layers,
-  ChevronRight,
   LayoutDashboard
 } from "lucide-react"
 import { ModeToggle } from "@/components/ui/toggle"

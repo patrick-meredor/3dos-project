@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/server"
 import { redirect } from "next/navigation"
+import { getHabits } from "@/app/habits/action"
 import {
   SidebarProvider,
   SidebarInset,
@@ -24,9 +25,10 @@ export default async function TodosLayout({
   children: React.ReactNode
 }) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const [{ data: { user } }, { habits }] = await Promise.all([
+    supabase.auth.getUser(),
+    getHabits(),
+  ])
 
   if (!user) {
     redirect("/login")
@@ -34,7 +36,7 @@ export default async function TodosLayout({
 
   return (
     <SidebarProvider>
-      <AppSidebar user={user} />
+      <AppSidebar user={user} habits={habits} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-4 transition-[width,height] ease-linear">
           <div className="flex items-center gap-2">

@@ -7,16 +7,19 @@ import { usePathname } from "next/navigation"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 import {
   LayoutDashboard,
-  Map,
   Target,
-  Sparkles,
-  LogOut,
   ChevronUp,
-  User as UserIcon,
-  Home,
   CheckCircle2,
+  Circle,
+  Flame,
+  Plus,
+  ArrowRight,
   List,
+  Home,
+  LogOut,
 } from "lucide-react"
+import { cn } from "@/lib/utils"
+import type { HabitItem } from "@/app/habits/action"
 
 import {
   Sidebar,
@@ -40,14 +43,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { ModeToggle } from "@/components/ui/toggle"
 import { signOut } from "@/app/login/action"
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user?: SupabaseUser | null
+  habits?: HabitItem[]
 }
 
-export function AppSidebar({ user, ...props }: AppSidebarProps) {
+export function AppSidebar({ user, habits = [], ...props }: AppSidebarProps) {
   const pathname = usePathname()
 
   const mainNav = [
@@ -68,11 +71,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     },
   ]
 
-  const habits = [
-    { name: "Morning Exercise", streak: "12d" },
-    { name: "Deep Work (2 hrs)", streak: "8d" },
-    { name: "Reading 20 Pages", streak: "5d" },
-  ]
+  const displayHabits = habits.slice(0, 5)
 
   const userEmail = user?.email ?? "user@example.com"
   const userInitial = userEmail.charAt(0).toUpperCase()
@@ -142,17 +141,63 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {habits.map((habit) => (
-                <SidebarMenuItem key={habit.name}>
-                  <SidebarMenuButton size="sm" className="cursor-default hover:bg-transparent">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    <span className="flex-1 truncate text-xs">{habit.name}</span>
-                    <span className="text-[10px] font-semibold text-orange-500 bg-orange-500/10 px-1.5 py-0.5 rounded-full">
-                      {habit.streak}
-                    </span>
+              {displayHabits.length === 0 ? (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    render={<Link href="/habits" />}
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <Plus className="h-4 w-4 text-primary" />
+                    <span className="text-xs">Add your first habit</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+              ) : (
+                <>
+                  {displayHabits.map((habit) => (
+                    <SidebarMenuItem key={habit.id}>
+                      <SidebarMenuButton
+                        render={<Link href="/habits" />}
+                        size="sm"
+                        className="hover:bg-sidebar-accent"
+                      >
+                        {habit.completed_today ? (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                        ) : (
+                          <Circle className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+                        )}
+                        <span
+                          className={cn(
+                            "flex-1 truncate text-xs",
+                            habit.completed_today
+                              ? "text-muted-foreground line-through"
+                              : "text-foreground font-medium"
+                          )}
+                        >
+                          {habit.title}
+                        </span>
+                        <span className="text-[10px] font-semibold text-orange-500 bg-orange-500/10 px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shrink-0">
+                          <Flame className="h-2.5 w-2.5" />
+                          {habit.streak}d
+                        </span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+
+                  {habits.length > 5 && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        render={<Link href="/habits" />}
+                        size="xs"
+                        className="text-muted-foreground hover:text-foreground text-[11px] justify-between px-2"
+                      >
+                        <span>View all {habits.length} habits</span>
+                        <ArrowRight className="h-3 w-3" />
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
+                </>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

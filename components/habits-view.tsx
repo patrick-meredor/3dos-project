@@ -25,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { calculateStreak } from "@/lib/habits"
 import {
   addHabit,
   toggleHabitToday,
@@ -122,7 +123,6 @@ create policy "Users can manage their own habits"
   // Handle Toggle Today
   const handleToggleToday = (habit: HabitItem) => {
     const nextStatus = !habit.completed_today
-    const nextStreak = nextStatus ? habit.streak + 1 : Math.max(0, habit.streak - 1)
     const todayStr = new Date().toISOString().split('T')[0]
 
     let updatedDates = [...habit.completed_dates]
@@ -131,6 +131,8 @@ create policy "Users can manage their own habits"
     } else {
       updatedDates = updatedDates.filter((d) => d !== todayStr)
     }
+
+    const nextStreak = calculateStreak(updatedDates)
 
     // Optimistic update
     setHabits((prev) =>
