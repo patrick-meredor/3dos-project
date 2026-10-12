@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/server'
+import { calculateStreak, generatePastDates } from '@/lib/habits'
 
 export interface HabitItem {
   id: string
@@ -14,29 +15,35 @@ export interface HabitItem {
   created_at?: string
 }
 
-const DEFAULT_STARTER_HABITS: Omit<HabitItem, 'id' | 'user_id'>[] = [
-  {
-    title: "Morning Sunlight & Hydration",
-    category: "Morning",
-    streak: 12,
-    completed_today: true,
-    completed_dates: [],
-  },
-  {
-    title: "Deep Work (90 Minutes)",
-    category: "Mindset",
-    streak: 8,
-    completed_today: false,
-    completed_dates: [],
-  },
-  {
-    title: "Read 10 Pages of Wisdom",
-    category: "Evening",
-    streak: 5,
-    completed_today: false,
-    completed_dates: [],
-  },
-]
+function getStarterHabits(): Omit<HabitItem, 'id' | 'user_id'>[] {
+  const morningDates = generatePastDates(12, true)
+  const mindsetDates = generatePastDates(8, false)
+  const eveningDates = generatePastDates(5, false)
+
+  return [
+    {
+      title: "Morning Sunlight & Hydration",
+      category: "Morning",
+      streak: 12,
+      completed_today: true,
+      completed_dates: morningDates,
+    },
+    {
+      title: "Deep Work (90 Minutes)",
+      category: "Mindset",
+      streak: 8,
+      completed_today: false,
+      completed_dates: mindsetDates,
+    },
+    {
+      title: "Read 10 Pages of Wisdom",
+      category: "Evening",
+      streak: 5,
+      completed_today: false,
+      completed_dates: eveningDates,
+    },
+  ]
+}
 
 export async function getHabits(): Promise<{
   habits: HabitItem[]
@@ -61,7 +68,7 @@ export async function getHabits(): Promise<{
   if (error) {
     // Check if table does not exist
     if (error.code === '42P01' || error.message.includes('relation "habits" does not exist')) {
-      const demoHabits: HabitItem[] = DEFAULT_STARTER_HABITS.map((h, i) => ({
+      const demoHabits: HabitItem[] = getStarterHabits().map((h, i) => ({
         ...h,
         id: `demo-${i + 1}`,
         user_id: user.id,
@@ -74,17 +81,33 @@ export async function getHabits(): Promise<{
   const todayStr = new Date().toISOString().split('T')[0]
 
   const mapped: HabitItem[] = (data || []).map((row: any) => {
-    const dates = Array.isArray(row.completed_dates) ? row.completed_dates : []
-    const isCompletedToday = Boolean(
-      row.completed_today || dates.includes(todayStr)
-    )
+    const rawDates = row.completed_dates
+    const dates: string[] = Array.isArray(rawDates)
+      ? rawDates
+      : typeof rawDates === 'string'
+        ? JSON.parse(rawDates)
+        : []
+
+    // A habit is completed today if todayStr is in its completed_dates history.
+    // This automatically resets every day at midnight.
+    const isCompletedToday = dates.includes(todayStr)
+    const computedStreak = dates.length > 0 ? calculateStreak(dates) : (Number(row.streak) || 0)
+
+    // Sync database asynchronously if state has changed since last visit
+    if (row.completed_today !== isCompletedToday || Number(row.streak) !== computedStreak) {
+      supabase
+        .from('habits')
+        .update({ completed_today: isCompletedToday, streak: computedStreak })
+        .eq('id', row.id)
+        .then()
+    }
 
     return {
       id: String(row.id),
       user_id: row.user_id,
       title: row.title || 'Untitled Habit',
       category: row.category || 'General',
-      streak: Number(row.streak) || 0,
+      streak: computedStreak,
       completed_today: isCompletedToday,
       completed_dates: dates,
       created_at: row.created_at,
@@ -132,6 +155,8 @@ export async function addHabit(data: {
   }
 
   revalidatePath('/habits')
+  revalidatePath('/dashboard')
+  revalidatePath('/todos')
   return {
     success: true,
     habit: {
@@ -163,7 +188,6 @@ export async function toggleHabitToday(
   }
 
   const nextStatus = !currentStatus
-  const nextStreak = nextStatus ? currentStreak + 1 : Math.max(0, currentStreak - 1)
   const todayStr = new Date().toISOString().split('T')[0]
 
   let updatedDates = [...currentDates]
@@ -172,6 +196,8 @@ export async function toggleHabitToday(
   } else {
     updatedDates = updatedDates.filter((d) => d !== todayStr)
   }
+
+  const nextStreak = calculateStreak(updatedDates)
 
   const { error } = await supabase
     .from('habits')
@@ -188,6 +214,8 @@ export async function toggleHabitToday(
   }
 
   revalidatePath('/habits')
+  revalidatePath('/dashboard')
+  revalidatePath('/todos')
   return { success: true }
 }
 
@@ -212,6 +240,8 @@ export async function deleteHabit(id: string): Promise<{ success: boolean; error
   }
 
   revalidatePath('/habits')
+  revalidatePath('/dashboard')
+  revalidatePath('/todos')
   return { success: true }
 }
 
@@ -243,5 +273,7 @@ export async function updateHabit(
   }
 
   revalidatePath('/habits')
+  revalidatePath('/dashboard')
+  revalidatePath('/todos')
   return { success: true }
 }
