@@ -97,6 +97,7 @@ export async function addTodo(title: string): Promise<{ success: boolean; todo?:
   }
 
   revalidatePath('/todos')
+  revalidatePath('/dashboard')
   return {
     success: true,
     todo: {
@@ -153,6 +154,7 @@ export async function updateTodo(
   }
 
   revalidatePath('/todos')
+  revalidatePath('/dashboard')
   return { success: true }
 }
 
@@ -177,5 +179,6 @@ export async function deleteTodo(id: string): Promise<{ success: boolean; error?
   }
 
   revalidatePath('/todos')
+  revalidatePath('/dashboard')
   return { success: true }
 }
