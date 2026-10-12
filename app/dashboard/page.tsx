@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/server"
 import { getHabits } from "@/app/habits/action"
+import { getLocalDateString } from "@/lib/habits"
 import { getTodos } from "@/app/todos/action"
 import { quoteItems } from "@/lib/quotes"
 import {
@@ -15,10 +16,11 @@ import {
   ArrowRight,
   List,
   Plus,
+  Clock,
 } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { formatTodoDate } from "@/lib/todos"
+import { formatTodoDate, formatTodoCreatedAt } from "@/lib/todos"
 
 function getDayOfYear(date: Date): number {
   const startOfYear = new Date(date.getFullYear(), 0, 0)
@@ -45,7 +47,7 @@ export default async function DashboardPage() {
     year: "numeric",
   })
 
-  const todayStr = new Date().toISOString().split("T")[0]
+  const todayStr = getLocalDateString()
 
   // 1. STREAK: Best streak across habits
   const streaks = habits.map((h) => Number(h.streak) || 0)
@@ -68,7 +70,7 @@ export default async function DashboardPage() {
   for (let i = 0; i < 7; i++) {
     const d = new Date(now)
     d.setDate(d.getDate() - i)
-    last7Days.push(d.toISOString().split("T")[0])
+    last7Days.push(getLocalDateString(d))
   }
 
   let actualCheckinsLast7Days = 0
@@ -412,13 +414,24 @@ export default async function DashboardPage() {
                         ) : (
                           <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
                         )}
-                        <span
-                          className={`text-sm truncate ${
-                            t.is_completed ? "line-through text-muted-foreground" : "font-medium text-foreground"
-                          }`}
-                        >
-                          {t.title}
-                        </span>
+                        <div className="flex flex-col min-w-0">
+                          <span
+                            className={`text-sm truncate ${
+                              t.is_completed ? "line-through text-muted-foreground" : "font-medium text-foreground"
+                            }`}
+                          >
+                            {t.title}
+                          </span>
+                          {t.created_at && (
+                            <span
+                              suppressHydrationWarning
+                              className="text-[10px] text-muted-foreground font-mono flex items-center gap-1 mt-0.5"
+                            >
+                              <Clock className="h-2.5 w-2.5" />
+                              Created {formatTodoCreatedAt(t.created_at)}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {dateInfo.label && (
