@@ -18,6 +18,7 @@ import {
 import { AppSidebar } from "@/components/app-sidebar"
 import { ModeToggle } from "@/components/ui/toggle"
 import Link from "next/link"
+import { GridBackground } from "@/components/grid-background"
 
 export default async function HabitsLayout({
   children,
@@ -58,6 +59,7 @@ export default async function HabitsLayout({
             <ModeToggle />
           </div>
         </header>
+        <GridBackground />
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 md:p-8">
           {children}
         </div>
