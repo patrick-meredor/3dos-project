@@ -21,7 +21,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { formatTodoDate, formatTodoCreatedAt } from "@/lib/todos"
+import { formatTodoDate, formatTodoCreatedAt, getTodoTimingStatus } from "@/lib/todos"
 import { getLocalDateString } from "@/lib/habits"
 import { addTodo, updateTodo, deleteTodo, type TodoItem } from "@/app/todos/action"
 
@@ -34,10 +34,8 @@ interface TodosViewProps {
 export function TodosView({ initialTodos, tableMissing = false, dbError }: TodosViewProps) {
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
   const [newTitle, setNewTitle] = useState("")
-  const [newDueDate, setNewDueDate] = useState(() => getLocalDateString())
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState("")
-  const [editDueDate, setEditDueDate] = useState("")
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all")
   const [copiedSql, setCopiedSql] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -49,12 +47,13 @@ create table if not exists public.todos (
   user_id uuid references auth.users(id) on delete cascade not null default auth.uid(),
   title text not null,
   is_completed boolean default false not null,
-  due_date date default current_date not null,
+  completed_at timestamp with time zone,
+  due_date date default current_date,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
 -- If you already created public.todos, run this line:
-alter table public.todos add column if not exists due_date date default current_date;
+alter table public.todos add column if not exists completed_at timestamp with time zone;
 
 alter table public.todos enable row level security;
 
@@ -76,7 +75,6 @@ create policy "Users can manage their own todos"
 
     const tempId = `temp-${Date.now()}`
     const titleToAdd = newTitle.trim()
-    const dateToAdd = newDueDate || getLocalDateString()
     setNewTitle("")
     setActionError(null)
 
@@ -86,13 +84,14 @@ create policy "Users can manage their own todos"
       user_id: "",
       title: titleToAdd,
       is_completed: false,
-      due_date: dateToAdd,
+      due_date: getLocalDateString(),
+      completed_at: undefined,
       created_at: new Date().toISOString(),
     }
     setTodos((prev) => [optimisticTodo, ...prev])
 
     startTransition(async () => {
-      const res = await addTodo(titleToAdd, dateToAdd)
+      const res = await addTodo(titleToAdd)
       if (!res.success) {
         setActionError(res.error || "Failed to create task.")
         // Rollback
@@ -112,18 +111,28 @@ create policy "Users can manage their own todos"
       setEditingId(null)
     }
     const nextState = !todo.is_completed
+    const nowIso = new Date().toISOString()
+    const nextCompletedAt = nextState ? nowIso : undefined
+
     // Optimistic toggle
     setTodos((prev) =>
-      prev.map((t) => (t.id === todo.id ? { ...t, is_completed: nextState } : t))
+      prev.map((t) =>
+        t.id === todo.id
+          ? { ...t, is_completed: nextState, completed_at: nextCompletedAt }
+          : t
+      )
     )
 
     startTransition(async () => {
-      const res = await updateTodo(todo.id, { is_completed: nextState })
+      const res = await updateTodo(todo.id, {
+        is_completed: nextState,
+        completed_at: nextCompletedAt ?? null,
+      })
       if (!res.success) {
         setActionError(res.error || "Failed to update task status.")
         // Rollback
         setTodos((prev) =>
-          prev.map((t) => (t.id === todo.id ? { ...t, is_completed: !nextState } : t))
+          prev.map((t) => (t.id === todo.id ? todo : t))
         )
       }
     })
@@ -134,7 +143,6 @@ create policy "Users can manage their own todos"
     if (todo.is_completed) return
     setEditingId(todo.id)
     setEditTitle(todo.title)
-    setEditDueDate(todo.due_date || (todo.created_at ? todo.created_at.split("T")[0] : ""))
   }
 
   // Save Edit
@@ -151,18 +159,17 @@ create policy "Users can manage their own todos"
     }
 
     const updatedTitle = editTitle.trim()
-    const updatedDueDate = editDueDate || undefined
     setEditingId(null)
 
     // Optimistic update
     setTodos((prev) =>
       prev.map((t) =>
-        t.id === id ? { ...t, title: updatedTitle, due_date: updatedDueDate } : t
+        t.id === id ? { ...t, title: updatedTitle } : t
       )
     )
 
     startTransition(async () => {
-      const res = await updateTodo(id, { title: updatedTitle, due_date: updatedDueDate })
+      const res = await updateTodo(id, { title: updatedTitle })
       if (!res.success) {
         setActionError(res.error || "Failed to update title.")
         if (original) {
@@ -224,7 +231,7 @@ create policy "Users can manage their own todos"
           <p className="text-xs text-muted-foreground leading-relaxed">
             The table <code className="font-mono bg-muted px-1 py-0.5 rounded">public.todos</code> does not exist yet in your Supabase project. Click the button above to copy the table schema, paste it into your <strong>Supabase Dashboard &rarr; SQL Editor</strong>, and click <strong>Run</strong>.
           </p>
-          <pre className="p-3 rounded-lg bg-background/80 border text-[11px] font-mono text-muted-foreground overflow-x-auto">
+          <pre className="p-3 rounded-lg bg-background border text-[11px] font-mono text-muted-foreground overflow-x-auto">
             {sqlSnippet}
           </pre>
         </div>
@@ -269,31 +276,18 @@ create policy "Users can manage their own todos"
       </div>
 
       {/* Add Todo Bar */}
-      <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-2">
+      <form onSubmit={handleAdd} className="flex gap-2">
         <Input
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="Add a new task (e.g. 30m Deep Work, Morning Walk)..."
+          placeholder="Add a new task for today (e.g. 30m Deep Work, Morning Walk)..."
           className="flex-1 h-10 px-3.5 text-sm"
           disabled={isPending}
         />
-        <div className="flex gap-2 shrink-0">
-          <div className="flex items-center gap-1.5 px-3 rounded-lg border bg-background/50 h-10">
-            <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
-            <input
-              type="date"
-              value={newDueDate}
-              onChange={(e) => setNewDueDate(e.target.value)}
-              className="bg-transparent text-xs font-mono outline-none text-foreground cursor-pointer"
-              disabled={isPending}
-              title="Target Date"
-            />
-          </div>
-          <Button type="submit" disabled={isPending || !newTitle.trim()} className="gap-1.5 h-10 px-4 shrink-0">
-            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-            <span>Add Todo</span>
-          </Button>
-        </div>
+        <Button type="submit" disabled={isPending || !newTitle.trim()} className="gap-1.5 h-10 px-4 shrink-0">
+          {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+          <span>Add Todo</span>
+        </Button>
       </form>
 
       {/* Filter Tabs */}
@@ -355,13 +349,13 @@ create policy "Users can manage their own todos"
         ) : (
           filteredTodos.map((todo) => {
             const isEditing = editingId === todo.id && !todo.is_completed
-            const dateInfo = formatTodoDate(todo.due_date || todo.created_at)
+            const timing = getTodoTimingStatus(todo.created_at, todo.completed_at, todo.is_completed)
 
             return (
               <div
                 key={todo.id}
                 className={cn(
-                  "group flex items-center justify-between gap-3 p-3.5 rounded-xl border bg-card/80 backdrop-blur-sm shadow-sm transition-all hover:shadow-md",
+                  "group flex items-center justify-between gap-3 p-3.5 rounded-xl border bg-card backdrop-blur-sm shadow-sm transition-all hover:shadow-md",
                   todo.is_completed && "opacity-75 bg-muted/40"
                 )}
               >
@@ -381,7 +375,7 @@ create policy "Users can manage their own todos"
                   </button>
 
                   {isEditing ? (
-                    <div className="flex flex-wrap items-center gap-1.5 flex-1">
+                    <div className="flex items-center gap-1.5 flex-1">
                       <Input
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
@@ -391,12 +385,6 @@ create policy "Users can manage their own todos"
                         }}
                         autoFocus
                         className="h-8 text-sm flex-1 min-w-[160px]"
-                      />
-                      <input
-                        type="date"
-                        value={editDueDate}
-                        onChange={(e) => setEditDueDate(e.target.value)}
-                        className="h-8 text-xs font-mono px-2 rounded-lg border bg-background text-foreground"
                       />
                       <Button
                         size="icon-xs"
@@ -427,32 +415,57 @@ create policy "Users can manage their own todos"
                         {todo.title}
                       </span>
                       <div className="flex flex-wrap items-center gap-2 mt-1">
-                        <span
-                          className={cn(
-                            "inline-flex items-center gap-1 text-[11px] font-mono px-1.5 py-0.5 rounded border",
-                            dateInfo.isToday
-                              ? "bg-primary/10 text-primary border-primary/20 font-semibold"
-                              : dateInfo.isPast && !todo.is_completed
-                              ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                              : "bg-muted/40 text-muted-foreground border-border/40"
-                          )}
-                        >
-                          <Calendar className="h-3 w-3" />
-                          {dateInfo.label}
-                        </span>
-                        {dateInfo.isPast && !todo.is_completed && (
-                          <span className="text-[10px] uppercase font-semibold text-amber-600 dark:text-amber-400">
-                            Overdue
+                        {/* Status Badge: "okay" / "late" if finished, "today" / "overdue" if active */}
+                        {todo.is_completed ? (
+                          <span
+                            className={cn(
+                              "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
+                              timing.status === "okay"
+                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+                            )}
+                          >
+                            {timing.status === "okay" ? (
+                              <CheckCircle2 className="h-3 w-3" />
+                            ) : (
+                              <Clock className="h-3 w-3" />
+                            )}
+                            <span>{timing.badgeLabel}</span>
+                          </span>
+                        ) : (
+                          <span
+                            className={cn(
+                              "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
+                              timing.status === "today"
+                                ? "bg-primary/10 text-primary border-primary/20"
+                                : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                            )}
+                          >
+                            <Clock className="h-3 w-3" />
+                            <span>{timing.status === "today" ? "Today" : "Overdue"}</span>
                           </span>
                         )}
-                        {todo.created_at && (
+
+                        {/* Timestamps */}
+                        {timing.createdFormatted && (
                           <span
                             suppressHydrationWarning
                             className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground/80"
-                            title={`Created on ${formatTodoCreatedAt(todo.created_at)}`}
+                            title={`Created on ${timing.createdFormatted}`}
                           >
                             <Clock className="h-3 w-3 text-muted-foreground/60" />
-                            <span>Created {formatTodoCreatedAt(todo.created_at)}</span>
+                            <span>Created {timing.createdFormatted}</span>
+                          </span>
+                        )}
+
+                        {todo.is_completed && timing.completedFormatted && (
+                          <span
+                            suppressHydrationWarning
+                            className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground/80"
+                            title={`Done on ${timing.completedFormatted}`}
+                          >
+                            <CheckCircle2 className="h-3 w-3 text-muted-foreground/60" />
+                            <span>Done {timing.completedFormatted}</span>
                           </span>
                         )}
                       </div>

@@ -121,3 +121,83 @@ export function formatTodoCreatedAt(dateStr?: string): string {
   }
 }
 
+export interface TodoTiming {
+  isDone: boolean
+  status: "okay" | "late" | "today" | "overdue"
+  badgeLabel: string
+  createdFormatted: string
+  completedFormatted?: string
+}
+
+/**
+ * Compares the todo's accomplished date/time against its created time.
+ * If accomplished within the day (same local day or within 24 hours) -> "okay".
+ * Otherwise -> "late".
+ * For active tasks: returns "today" or "overdue".
+ */
+export function getTodoTimingStatus(
+  createdAt?: string,
+  completedAt?: string,
+  isCompleted?: boolean
+): TodoTiming {
+  const createdFormatted = formatTodoCreatedAt(createdAt)
+  const completedFormatted = completedAt ? formatTodoCreatedAt(completedAt) : undefined
+
+  if (isCompleted) {
+    if (!completedAt || !createdAt) {
+      return {
+        isDone: true,
+        status: "okay",
+        badgeLabel: "okay",
+        createdFormatted,
+        completedFormatted,
+      }
+    }
+
+    const createdD = new Date(createdAt)
+    const completedD = new Date(completedAt)
+
+    const createdDateStr = getLocalDateString(createdD)
+    const completedDateStr = getLocalDateString(completedD)
+
+    // Accomplished "within the day": same calendar day or within 24 hours of creation
+    const isSameDay = createdDateStr === completedDateStr
+    const diffMs = completedD.getTime() - createdD.getTime()
+    const isWithin24Hours = diffMs >= 0 && diffMs <= 24 * 60 * 60 * 1000
+
+    const isWithinTheDay = isSameDay || isWithin24Hours
+
+    return {
+      isDone: true,
+      status: isWithinTheDay ? "okay" : "late",
+      badgeLabel: isWithinTheDay ? "okay" : "late",
+      createdFormatted,
+      completedFormatted,
+    }
+  }
+
+  // Active / in-progress task
+  if (!createdAt) {
+    return {
+      isDone: false,
+      status: "today",
+      badgeLabel: "today",
+      createdFormatted,
+    }
+  }
+
+  const createdD = new Date(createdAt)
+  const createdDateStr = getLocalDateString(createdD)
+  const todayStr = getLocalDateString()
+
+  const isOverdue = createdDateStr < todayStr
+
+  return {
+    isDone: false,
+    status: isOverdue ? "overdue" : "today",
+    badgeLabel: isOverdue ? "overdue" : "today",
+    createdFormatted,
+  }
+}
+
+

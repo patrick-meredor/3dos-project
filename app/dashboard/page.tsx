@@ -20,7 +20,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { formatTodoDate, formatTodoCreatedAt } from "@/lib/todos"
+import { getTodoTimingStatus } from "@/lib/todos"
 
 function getDayOfYear(date: Date): number {
   const startOfYear = new Date(date.getFullYear(), 0, 0)
@@ -402,7 +402,7 @@ export default async function DashboardPage() {
             ) : (
               <div className="space-y-2.5">
                 {todos.slice(0, 4).map((t) => {
-                  const dateInfo = formatTodoDate(t.due_date || t.created_at)
+                  const timing = getTodoTimingStatus(t.created_at, t.completed_at, t.is_completed)
                   return (
                     <div
                       key={t.id}
@@ -422,42 +422,58 @@ export default async function DashboardPage() {
                           >
                             {t.title}
                           </span>
-                          {t.created_at && (
-                            <span
-                              suppressHydrationWarning
-                              className="text-[10px] text-muted-foreground font-mono flex items-center gap-1 mt-0.5"
-                            >
-                              <Clock className="h-2.5 w-2.5" />
-                              Created {formatTodoCreatedAt(t.created_at)}
-                            </span>
-                          )}
+                          <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                            {timing.createdFormatted && (
+                              <span
+                                suppressHydrationWarning
+                                className="text-[10px] text-muted-foreground font-mono flex items-center gap-1"
+                              >
+                                <Clock className="h-2.5 w-2.5" />
+                                Created {timing.createdFormatted}
+                              </span>
+                            )}
+                            {t.is_completed && timing.completedFormatted && (
+                              <span
+                                suppressHydrationWarning
+                                className="text-[10px] text-muted-foreground font-mono flex items-center gap-1"
+                              >
+                                <CheckCircle2 className="h-2.5 w-2.5 text-emerald-500" />
+                                Done {timing.completedFormatted}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {dateInfo.label && (
+                        {t.is_completed ? (
                           <span
                             className={cn(
-                              "text-[10px] font-mono px-1.5 py-0.5 rounded flex items-center gap-1",
-                              dateInfo.isToday
-                                ? "bg-primary/10 text-primary font-medium"
-                                : dateInfo.isPast && !t.is_completed
-                                ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium"
-                                : "text-muted-foreground"
+                              "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex items-center gap-1",
+                              timing.status === "okay"
+                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
                             )}
                           >
-                            <Calendar className="h-2.5 w-2.5" />
-                            {dateInfo.label}
+                            {timing.status === "okay" ? (
+                              <CheckCircle2 className="h-3 w-3" />
+                            ) : (
+                              <Clock className="h-3 w-3" />
+                            )}
+                            {timing.badgeLabel}
+                          </span>
+                        ) : (
+                          <span
+                            className={cn(
+                              "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex items-center gap-1",
+                              timing.status === "today"
+                                ? "bg-primary/10 text-primary border-primary/20"
+                                : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                            )}
+                          >
+                            <Clock className="h-3 w-3" />
+                            {timing.status === "today" ? "Today" : "Overdue"}
                           </span>
                         )}
-                        <span
-                          className={`text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full ${
-                            t.is_completed
-                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                              : "bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          {t.is_completed ? "Done" : "To Do"}
-                        </span>
                       </div>
                     </div>
                   )

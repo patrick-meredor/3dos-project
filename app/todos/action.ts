@@ -10,6 +10,7 @@ export interface TodoItem {
   title: string
   is_completed: boolean
   due_date?: string
+  completed_at?: string
   created_at?: string
 }
 
@@ -48,6 +49,7 @@ export async function getTodos(): Promise<{ todos: TodoItem[]; error?: string; t
       title: row.title ?? row.task ?? '',
       is_completed: Boolean(row.is_completed ?? row.completed ?? false),
       due_date: dateFormatted,
+      completed_at: row.completed_at ? String(row.completed_at) : undefined,
       created_at: row.created_at,
     }
   })
@@ -121,6 +123,7 @@ export async function addTodo(
       title: data.title ?? cleanTitle,
       is_completed: false,
       due_date: data.due_date ? String(data.due_date).split('T')[0] : targetDate,
+      completed_at: undefined,
       created_at: data.created_at,
     },
   }
@@ -128,7 +131,12 @@ export async function addTodo(
 
 export async function updateTodo(
   id: string,
-  updates: { title?: string; is_completed?: boolean; due_date?: string }
+  updates: {
+    title?: string
+    is_completed?: boolean
+    completed_at?: string | null
+    due_date?: string
+  }
 ): Promise<{ success: boolean; error?: string }> {
   const supabase = await createClient()
   const {
@@ -159,6 +167,13 @@ export async function updateTodo(
   }
   if (updates.is_completed !== undefined) {
     payload.is_completed = updates.is_completed
+    if (updates.is_completed) {
+      payload.completed_at = updates.completed_at ?? new Date().toISOString()
+    } else {
+      payload.completed_at = null
+    }
+  } else if (updates.completed_at !== undefined) {
+    payload.completed_at = updates.completed_at
   }
   if (updates.due_date !== undefined) {
     payload.due_date = updates.due_date
@@ -169,6 +184,17 @@ export async function updateTodo(
     .update(payload)
     .eq('id', id)
     .eq('user_id', user.id)
+
+  // Fallback if column completed_at does not exist yet
+  if (error && payload.completed_at !== undefined && error.message.includes('completed_at')) {
+    delete payload.completed_at
+    const fallback = await supabase
+      .from('todos')
+      .update(payload)
+      .eq('id', id)
+      .eq('user_id', user.id)
+    error = fallback.error
+  }
 
   // Fallback if column due_date does not exist
   if (error && updates.due_date !== undefined && error.message.includes('due_date')) {
