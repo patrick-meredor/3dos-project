@@ -180,14 +180,14 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
   }, [year, month, filteredHabits, isCurrentMonth, now, todayStr, viewDate])
 
   return (
-    <div className="rounded-xl border bg-card/80 backdrop-blur-md p-6 shadow-sm space-y-6">
+    <div className="rounded-xl border bg-card/80 backdrop-blur-md p-3.5 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
       {/* Header with Title and Month Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-orange-500 mb-1">
-            <CalendarIcon className="h-4 w-4" /> Activity &bull; Calendar / History
+          <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-orange-500 mb-1">
+            <CalendarIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Activity &bull; Calendar / History
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold font-bernoru tracking-tight">
+          <h2 className="text-lg sm:text-2xl font-bold font-bernoru tracking-tight">
             HAVE I ACTUALLY BEEN CONSISTENT?
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -196,8 +196,8 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
         </div>
 
         {/* Month Navigation Controls */}
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <div className="flex items-center bg-muted/60 rounded-lg p-1 border">
+        <div className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto">
+          <div className="flex items-center bg-muted/60 rounded-lg p-0.5 sm:p-1 border flex-1 sm:flex-initial justify-between sm:justify-start">
             <Button
               variant="ghost"
               size="icon-xs"
@@ -207,7 +207,7 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="px-3 text-xs font-bold font-bernoru uppercase tracking-wider min-w-[125px] text-center">
+            <span className="px-2 sm:px-3 text-xs font-bold font-bernoru uppercase tracking-wider min-w-[105px] sm:min-w-[125px] text-center">
               {monthName} {year}
             </span>
             <Button
@@ -225,7 +225,7 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
               variant="outline"
               size="xs"
               onClick={handleTodayMonth}
-              className="text-xs h-9 px-3"
+              className="text-xs h-8 sm:h-9 px-2.5 sm:px-3 shrink-0"
             >
               Today
             </Button>
@@ -235,13 +235,13 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
 
       {/* Habit Filter Selection Pills (if user has habits) */}
       {habits.length > 1 && (
-        <div className="flex flex-wrap items-center gap-1.5 pb-2">
-          <span className="text-[11px] font-medium text-muted-foreground mr-1">Filter:</span>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar -mx-1 px-1 sm:flex-wrap">
+          <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground mr-1 shrink-0">Filter:</span>
           <button
             type="button"
             onClick={() => setSelectedHabitId("all")}
             className={cn(
-              "px-2.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer",
+              "px-2.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer shrink-0",
               selectedHabitId === "all"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -255,7 +255,7 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
               type="button"
               onClick={() => setSelectedHabitId(h.id)}
               className={cn(
-                "px-2.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer truncate max-w-[170px]",
+                "px-2.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer truncate max-w-[140px] sm:max-w-[170px] shrink-0",
                 selectedHabitId === h.id
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -268,21 +268,21 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
       )}
 
       {/* Main Grid + Stats Summary Row */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Left: GitHub-style Calendar Grid */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-xl border bg-background/40 p-4 sm:p-5">
+        <div className="lg:col-span-2 space-y-3 sm:space-y-4">
+          <div className="rounded-xl border bg-background/40 p-2.5 sm:p-5">
             {/* Month Label Header */}
-            <div className="text-center font-bernoru font-bold text-sm tracking-wider uppercase text-muted-foreground mb-4">
+            <div className="text-center font-bernoru font-bold text-xs sm:text-sm tracking-wider uppercase text-muted-foreground mb-3 sm:mb-4">
               {monthName} {year}
             </div>
 
             {/* Weekday Labels: M T W T F S S */}
-            <div className="grid grid-cols-7 gap-2 sm:gap-2.5 mb-2.5 text-center">
+            <div className="grid grid-cols-7 gap-1 sm:gap-2.5 mb-2 sm:mb-2.5 text-center">
               {WEEK_DAYS.map((day, idx) => (
                 <span
                   key={idx}
-                  className="text-xs font-bold text-muted-foreground uppercase font-mono tracking-wider"
+                  className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase font-mono tracking-wider"
                   title={WEEK_DAY_NAMES[idx]}
                 >
                   {day}
@@ -291,7 +291,7 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
             </div>
 
             {/* Days Grid */}
-            <div className="grid grid-cols-7 gap-2 sm:gap-2.5">
+            <div className="grid grid-cols-7 gap-1 sm:gap-2.5">
               {/* Empty leading offset days */}
               {Array.from({ length: offset }).map((_, i) => (
                 <div key={`offset-${i}`} className="aspect-square" />
@@ -309,9 +309,9 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
                     onMouseLeave={() => setHoveredDay(null)}
                     onClick={() => setHoveredDay(cell)}
                     className={cn(
-                      "aspect-square rounded-lg border transition-all duration-200 relative flex flex-col items-center justify-center p-1 cursor-pointer select-none",
+                      "aspect-square rounded-md sm:rounded-lg border transition-all duration-200 relative flex flex-col items-center justify-center p-0.5 sm:p-1 cursor-pointer select-none min-h-[32px] sm:min-h-[42px]",
                       // Today outline
-                      cell.isToday && "ring-2 ring-primary ring-offset-2 ring-offset-background z-10",
+                      cell.isToday && "ring-2 ring-primary ring-offset-1 sm:ring-offset-2 ring-offset-background z-10",
                       // Hovered state
                       isHovered && "scale-105 shadow-md z-20",
                       // Colors based on intensity & state
@@ -327,20 +327,20 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
                     )}
                     aria-label={`${cell.dateStr}: ${cell.completedCount} completed`}
                   >
-                    <span className="text-[11px] sm:text-xs font-mono">{cell.dayNumber}</span>
+                    <span className="text-[10px] sm:text-xs font-mono">{cell.dayNumber}</span>
                   </button>
                 )
               })}
             </div>
 
             {/* Calendar Legend */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-4 mt-4 border-t text-[11px] text-muted-foreground">
-              <div className="flex items-center gap-1.5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-3 sm:pt-4 mt-3 sm:mt-4 border-t text-[10px] sm:text-[11px] text-muted-foreground">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <span>Less</span>
-                <div className="h-3.5 w-3.5 rounded-sm bg-muted/30 border border-border/60" title="0 habits" />
-                <div className="h-3.5 w-3.5 rounded-sm bg-orange-500/25 border border-orange-500/40" title="Low activity" />
-                <div className="h-3.5 w-3.5 rounded-sm bg-orange-500/60 border border-orange-500/70" title="Medium activity" />
-                <div className="h-3.5 w-3.5 rounded-sm bg-orange-500 border border-orange-500 shadow-xs" title="All habits completed" />
+                <div className="h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-xs sm:rounded-sm bg-muted/30 border border-border/60" title="0 habits" />
+                <div className="h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-xs sm:rounded-sm bg-orange-500/25 border border-orange-500/40" title="Low activity" />
+                <div className="h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-xs sm:rounded-sm bg-orange-500/60 border border-orange-500/70" title="Medium activity" />
+                <div className="h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-xs sm:rounded-sm bg-orange-500 border border-orange-500 shadow-xs" title="All habits completed" />
                 <span>More</span>
               </div>
               <span className="text-muted-foreground/80">
@@ -351,17 +351,17 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
 
           {/* Interactive Day Details Banner */}
           {hoveredDay ? (
-            <div className="rounded-lg border bg-background/70 backdrop-blur-xs p-3.5 flex items-center justify-between text-xs animate-in fade-in duration-150">
+            <div className="rounded-lg border bg-background/70 backdrop-blur-xs p-3 sm:p-3.5 flex items-center justify-between text-xs animate-in fade-in duration-150">
               <div className="space-y-0.5">
-                <div className="font-semibold text-foreground flex items-center gap-1.5">
+                <div className="font-semibold text-foreground flex items-center gap-1.5 text-xs">
                   <span>{new Date(hoveredDay.dateStr + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", year: "numeric" })}</span>
                   {hoveredDay.isToday && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-primary text-primary-foreground">
+                    <span className="px-1.5 py-0.2 rounded-full text-[9px] sm:text-[10px] font-bold bg-primary text-primary-foreground">
                       TODAY
                     </span>
                   )}
                 </div>
-                <div className="text-muted-foreground">
+                <div className="text-muted-foreground text-xs">
                   {hoveredDay.isFuture ? (
                     "Future date"
                   ) : hoveredDay.completedCount > 0 ? (
@@ -377,27 +377,27 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
                 </div>
               </div>
               {hoveredDay.completedCount > 0 && (
-                <div className="p-1.5 rounded-md bg-orange-500/10 text-orange-500 shrink-0">
-                  <CheckCircle2 className="h-4 w-4" />
+                <div className="p-1 sm:p-1.5 rounded-md bg-orange-500/10 text-orange-500 shrink-0">
+                  <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
               )}
             </div>
           ) : (
-            <div className="rounded-lg border border-dashed bg-muted/10 p-3 text-center text-xs text-muted-foreground">
-              Tip: Hover over past calendar squares to view which habits were checked in that day.
+            <div className="rounded-lg border border-dashed bg-muted/10 p-2.5 sm:p-3 text-center text-xs text-muted-foreground">
+              Tip: Hover or tap past calendar squares to view which habits were checked in that day.
             </div>
           )}
         </div>
 
-        {/* Right: Monthly Statistics Overview (Exactly as requested) */}
-        <div className="rounded-xl border bg-background/50 p-5 flex flex-col justify-between space-y-4">
+        {/* Right: Monthly Statistics Overview */}
+        <div className="rounded-xl border bg-background/50 p-3.5 sm:p-5 flex flex-col justify-between space-y-3 sm:space-y-4">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b">
+            <div className="flex items-center justify-between pb-2.5 sm:pb-3 border-b">
               <div>
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground block">
+                <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-muted-foreground block">
                   MONTHLY METRICS
                 </span>
-                <h3 className="text-lg font-bold font-bernoru tracking-tight text-foreground">
+                <h3 className="text-base sm:text-lg font-bold font-bernoru tracking-tight text-foreground">
                   {monthName.toUpperCase()}
                 </h3>
               </div>
@@ -406,32 +406,32 @@ export function ActivityCalendar({ habits }: ActivityCalendarProps) {
               </span>
             </div>
 
-            <div className="divide-y divide-border/60 text-sm">
-              <div className="py-3.5 flex items-center justify-between">
+            <div className="divide-y divide-border/60 text-xs sm:text-sm">
+              <div className="py-2.5 sm:py-3.5 flex items-center justify-between">
                 <span className="text-muted-foreground">Completed days</span>
-                <span className="font-bold font-bernoru text-lg text-foreground">
+                <span className="font-bold font-bernoru text-base sm:text-lg text-foreground">
                   {stats.completedDays}
                 </span>
               </div>
 
-              <div className="py-3.5 flex items-center justify-between">
+              <div className="py-2.5 sm:py-3.5 flex items-center justify-between">
                 <span className="text-muted-foreground">Completion rate</span>
-                <span className="font-bold font-bernoru text-lg text-emerald-600 dark:text-emerald-400">
+                <span className="font-bold font-bernoru text-base sm:text-lg text-emerald-600 dark:text-emerald-400">
                   {stats.completionRate}%
                 </span>
               </div>
 
-              <div className="py-3.5 flex items-center justify-between">
+              <div className="py-2.5 sm:py-3.5 flex items-center justify-between">
                 <span className="text-muted-foreground">Best streak</span>
-                <span className="font-bold font-bernoru text-lg text-orange-500 flex items-center gap-1">
-                  <Flame className="h-4 w-4" />
+                <span className="font-bold font-bernoru text-base sm:text-lg text-orange-500 flex items-center gap-1">
+                  <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   {stats.bestStreak} {stats.bestStreak === 1 ? "day" : "days"}
                 </span>
               </div>
 
-              <div className="py-3.5 flex items-center justify-between">
+              <div className="py-2.5 sm:py-3.5 flex items-center justify-between">
                 <span className="text-muted-foreground">Total check-ins</span>
-                <span className="font-bold font-bernoru text-lg text-foreground">
+                <span className="font-bold font-bernoru text-base sm:text-lg text-foreground">
                   {stats.totalCheckins}
                 </span>
               </div>

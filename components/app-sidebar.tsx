@@ -35,6 +35,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
   SidebarSeparator,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import {
   DropdownMenu,
@@ -53,6 +54,14 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 export function AppSidebar({ user, habits = [], ...props }: AppSidebarProps) {
   const pathname = usePathname()
+  const { setOpenMobile, isMobile } = useSidebar()
+
+  // Auto-close sidebar on mobile whenever the route changes
+  React.useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }, [pathname, isMobile, setOpenMobile])
 
   const mainNav = [
     {

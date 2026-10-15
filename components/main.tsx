@@ -8,10 +8,10 @@ export default function Main() {
     const { currentIndex, setCurrentIndex, items } = useMainQuotes()
 
     return (
-        <main className="flex-1 w-full flex flex-col justify-end pb-8 sm:pb-14 px-4 sm:px-8 max-w-7xl mx-auto">
+        <main className="flex-1 w-full flex flex-col justify-end pb-6 sm:pb-12 px-3 sm:px-6 md:px-8 max-w-7xl mx-auto">
             {/* Three circles author avatars + active author pill */}
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-4">
-                <div className="flex -space-x-3 hover:space-x-1 transition-all duration-300 py-1">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 mb-3 sm:mb-4">
+                <div className="flex -space-x-2.5 sm:-space-x-3 hover:space-x-1 transition-all duration-300 py-1">
                     {items.map((item, idx) => {
                         const isActive = idx === currentIndex
                         return (
@@ -23,9 +23,9 @@ export default function Main() {
                                 aria-label={`View quote by ${item.author}`}
                                 className={cn(
                                     "relative rounded-full transition-all duration-300 focus:outline-none cursor-pointer",
-                                    "h-14 w-14 sm:h-16 sm:w-16 overflow-hidden border-2 shadow-md",
+                                    "h-11 w-11 sm:h-14 sm:w-14 md:h-16 md:w-16 overflow-hidden border-2 shadow-md",
                                     isActive
-                                        ? "z-30 scale-110 border-orange-500 ring-4 ring-orange-500/25 shadow-lg"
+                                        ? "z-30 scale-110 border-orange-500 ring-3 sm:ring-4 ring-orange-500/25 shadow-lg"
                                         : "z-10 opacity-70 hover:opacity-100 hover:scale-105 border-background bg-muted"
                                 )}
                             >
@@ -45,14 +45,14 @@ export default function Main() {
                 </div>
 
                 {/* Active author indicator badge */}
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/70 border border-border/50 text-xs sm:text-sm font-semibold font-signika tracking-wider uppercase text-foreground">
+                <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-muted/70 border border-border/50 text-[11px] sm:text-xs md:text-sm font-semibold font-signika tracking-wider uppercase text-foreground">
                     <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
                     <span>{items[currentIndex]?.author}</span>
                 </div>
             </div>
 
             {/* Rotating Quotes */}
-            <div className="grid grid-cols-1 items-start min-h-35 sm:min-h-45">
+            <div className="grid grid-cols-1 items-start min-h-[140px] sm:min-h-[160px] md:min-h-[180px]">
                 {items.map((item, idx) => (
                     <div
                         key={idx}
@@ -64,7 +64,7 @@ export default function Main() {
                                 : "opacity-0 pointer-events-none select-none"
                         )}
                     >
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-bernoru leading-[1.1] tracking-tight">
+                        <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-bernoru leading-[1.15] tracking-tight break-words">
                             {item.quote}
                             <span className="text-orange-500 dark:invert">.</span>
                         </h1>

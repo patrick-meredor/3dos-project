@@ -255,11 +255,11 @@ create policy "Users can manage their own todos"
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-bold font-bernoru tracking-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-bernoru tracking-tight">
             DAILY TODOS
           </h1>
-          <p className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-orange-500" />
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-orange-500 shrink-0" />
             <span>Keep your daily non-negotiables organized and synced with Supabase.</span>
           </p>
         </div>
@@ -280,24 +280,25 @@ create policy "Users can manage their own todos"
         <Input
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="Add a new task for today (e.g. 30m Deep Work, Morning Walk)..."
+          placeholder="Add a new task for today..."
           className="flex-1 h-10 px-3.5 text-sm"
           disabled={isPending}
         />
-        <Button type="submit" disabled={isPending || !newTitle.trim()} className="gap-1.5 h-10 px-4 shrink-0">
+        <Button type="submit" disabled={isPending || !newTitle.trim()} className="gap-1.5 h-10 px-3 sm:px-4 shrink-0">
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-          <span>Add Todo</span>
+          <span className="hidden xs:inline sm:inline">Add Todo</span>
+          <span className="inline xs:hidden">Add</span>
         </Button>
       </form>
 
       {/* Filter Tabs */}
       <div className="flex items-center justify-between border-b pb-2">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar">
           <Button
             variant={filter === "all" ? "default" : "ghost"}
             size="sm"
             onClick={() => setFilter("all")}
-            className="text-xs h-7"
+            className="text-xs h-7 px-2.5 sm:px-3"
           >
             All ({todos.length})
           </Button>
@@ -305,7 +306,7 @@ create policy "Users can manage their own todos"
             variant={filter === "active" ? "default" : "ghost"}
             size="sm"
             onClick={() => setFilter("active")}
-            className="text-xs h-7"
+            className="text-xs h-7 px-2.5 sm:px-3"
           >
             Active ({activeCount})
           </Button>
@@ -313,7 +314,7 @@ create policy "Users can manage their own todos"
             variant={filter === "completed" ? "default" : "ghost"}
             size="sm"
             onClick={() => setFilter("completed")}
-            className="text-xs h-7"
+            className="text-xs h-7 px-2.5 sm:px-3"
           >
             Completed ({completedCount})
           </Button>
@@ -355,16 +356,16 @@ create policy "Users can manage their own todos"
               <div
                 key={todo.id}
                 className={cn(
-                  "group flex items-center justify-between gap-3 p-3.5 rounded-xl border bg-card backdrop-blur-sm shadow-sm transition-all hover:shadow-md",
+                  "group flex items-center justify-between gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-xl border bg-card backdrop-blur-sm shadow-sm transition-all hover:shadow-md",
                   todo.is_completed && "opacity-75 bg-muted/40"
                 )}
               >
                 {/* Checkbox & Title & Date */}
-                <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
                   <button
                     type="button"
                     onClick={() => handleToggle(todo)}
-                    className="shrink-0 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    className="shrink-0 mt-0.5 sm:mt-0 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                     aria-label={todo.is_completed ? "Mark as active" : "Mark as completed"}
                   >
                     {todo.is_completed ? (
@@ -375,7 +376,7 @@ create policy "Users can manage their own todos"
                   </button>
 
                   {isEditing ? (
-                    <div className="flex items-center gap-1.5 flex-1">
+                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-1.5 flex-1 min-w-0">
                       <Input
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
@@ -384,27 +385,29 @@ create policy "Users can manage their own todos"
                           if (e.key === "Escape") setEditingId(null)
                         }}
                         autoFocus
-                        className="h-8 text-sm flex-1 min-w-[160px]"
+                        className="h-8 text-sm flex-1 min-w-[140px]"
                       />
-                      <Button
-                        size="icon-xs"
-                        variant="default"
-                        onClick={() => saveEdit(todo.id)}
-                        className="size-7"
-                      >
-                        <Check className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        size="icon-xs"
-                        variant="ghost"
-                        onClick={() => setEditingId(null)}
-                        className="size-7"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </Button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button
+                          size="icon-xs"
+                          variant="default"
+                          onClick={() => saveEdit(todo.id)}
+                          className="size-7"
+                        >
+                          <Check className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          size="icon-xs"
+                          variant="ghost"
+                          onClick={() => setEditingId(null)}
+                          className="size-7"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col min-w-0">
+                    <div className="flex flex-col min-w-0 flex-1">
                       <span
                         onClick={() => handleToggle(todo)}
                         className={cn(
@@ -414,34 +417,34 @@ create policy "Users can manage their own todos"
                       >
                         {todo.title}
                       </span>
-                      <div className="flex flex-wrap items-center gap-2 mt-1">
-                        {/* Status Badge: "okay" / "late" if finished, "today" / "overdue" if active */}
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
+                        {/* Status Badge */}
                         {todo.is_completed ? (
                           <span
                             className={cn(
-                              "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
+                              "inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full border",
                               timing.status === "okay"
                                 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                                 : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
                             )}
                           >
                             {timing.status === "okay" ? (
-                              <CheckCircle2 className="h-3 w-3" />
+                              <CheckCircle2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                             ) : (
-                              <Clock className="h-3 w-3" />
+                              <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                             )}
                             <span>{timing.badgeLabel}</span>
                           </span>
                         ) : (
                           <span
                             className={cn(
-                              "inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
+                              "inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full border",
                               timing.status === "today"
                                 ? "bg-primary/10 text-primary border-primary/20"
                                 : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                             )}
                           >
-                            <Clock className="h-3 w-3" />
+                            <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                             <span>{timing.status === "today" ? "Today" : "Overdue"}</span>
                           </span>
                         )}
@@ -450,10 +453,10 @@ create policy "Users can manage their own todos"
                         {timing.createdFormatted && (
                           <span
                             suppressHydrationWarning
-                            className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground/80"
+                            className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-mono text-muted-foreground/80"
                             title={`Created on ${timing.createdFormatted}`}
                           >
-                            <Clock className="h-3 w-3 text-muted-foreground/60" />
+                            <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-muted-foreground/60" />
                             <span>Created {timing.createdFormatted}</span>
                           </span>
                         )}
@@ -461,10 +464,10 @@ create policy "Users can manage their own todos"
                         {todo.is_completed && timing.completedFormatted && (
                           <span
                             suppressHydrationWarning
-                            className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground/80"
+                            className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-mono text-muted-foreground/80"
                             title={`Done on ${timing.completedFormatted}`}
                           >
-                            <CheckCircle2 className="h-3 w-3 text-muted-foreground/60" />
+                            <CheckCircle2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-muted-foreground/60" />
                             <span>Done {timing.completedFormatted}</span>
                           </span>
                         )}
@@ -473,9 +476,9 @@ create policy "Users can manage their own todos"
                   )}
                 </div>
 
-                {/* Actions: Edit & Delete */}
+                {/* Actions: Edit & Delete - visible on mobile/touch, hover on desktop */}
                 {!isEditing && (
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-0.5 sm:gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
                     {!todo.is_completed && (
                       <Button
                         variant="ghost"

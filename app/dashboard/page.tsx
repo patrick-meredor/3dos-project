@@ -147,78 +147,81 @@ export default async function DashboardPage() {
         }
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-6xl mx-auto">
+    <div className="flex flex-col gap-4 sm:gap-6 w-full max-w-6xl mx-auto">
       {/* Welcome Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 pb-1 sm:pb-2">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-bold font-bernoru tracking-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-bernoru tracking-tight break-words">
             WELCOME, {userName.toUpperCase()}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1.5">
-            <Calendar className="h-4 w-4" /> {formattedDate} &bull; Stay Consistent, Be Strong.
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 flex flex-wrap items-center gap-1.5">
+            <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 text-orange-500" />
+            <span>{formattedDate}</span>
+            <span className="hidden xs:inline">&bull;</span>
+            <span>Stay Consistent, Be Strong.</span>
           </p>
         </div>
       </div>
 
       {/* Metric Cards Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         {/* Streak */}
-        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-5 shadow-sm space-y-2">
+        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-3.5 sm:p-5 shadow-sm space-y-1.5 sm:space-y-2">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-medium uppercase tracking-wider">Current Streak</span>
-            <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500">
-              <Flame className="h-4 w-4" />
+            <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Current Streak</span>
+            <div className="p-1.5 sm:p-2 rounded-lg bg-orange-500/10 text-orange-500">
+              <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold font-bernoru">
+          <div className="text-2xl sm:text-3xl font-bold font-bernoru">
             {maxStreak} {maxStreak === 1 ? "DAY" : "DAYS"}
           </div>
-          <p className="text-xs text-muted-foreground">{streakSubtitle}</p>
+          <p className="text-[11px] sm:text-xs text-muted-foreground line-clamp-1">{streakSubtitle}</p>
         </div>
 
         {/* Consistency */}
-        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-5 shadow-sm space-y-2">
+        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-3.5 sm:p-5 shadow-sm space-y-1.5 sm:space-y-2">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-medium uppercase tracking-wider">Consistency Rate</span>
-            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
-              <TrendingUp className="h-4 w-4" />
+            <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Consistency Rate</span>
+            <div className="p-1.5 sm:p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+              <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold font-bernoru">{consistencyRate}%</div>
-          <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+          <div className="text-2xl sm:text-3xl font-bold font-bernoru">{consistencyRate}%</div>
+          <p className="text-[11px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-medium line-clamp-1">
             {consistencySubtitle}
           </p>
         </div>
 
         {/* Completed Actions */}
-        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-5 shadow-sm space-y-2">
+        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-3.5 sm:p-5 shadow-sm space-y-1.5 sm:space-y-2">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-medium uppercase tracking-wider">Completed Actions</span>
-            <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
-              <CheckCircle className="h-4 w-4" />
+            <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Completed Actions</span>
+            <div className="p-1.5 sm:p-2 rounded-lg bg-blue-500/10 text-blue-500">
+              <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold font-bernoru">{totalCompletedActions}</div>
-          <p className="text-xs text-muted-foreground">{actionsSubtitle}</p>
+          <div className="text-2xl sm:text-3xl font-bold font-bernoru">{totalCompletedActions}</div>
+          <p className="text-[11px] sm:text-xs text-muted-foreground line-clamp-1">{actionsSubtitle}</p>
         </div>
 
         {/* Active Focus */}
-        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-5 shadow-sm space-y-2">
+        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-3.5 sm:p-5 shadow-sm space-y-1.5 sm:space-y-2">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-medium uppercase tracking-wider">Active Focus</span>
-            <div className="p-2 rounded-lg bg-primary/10 text-primary">
-              <Target className="h-4 w-4" />
+            <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Active Focus</span>
+            <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 text-primary">
+              <Target className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
-          <div className="text-3xl font-bold font-bernoru">{activeFocusPhase}</div>
-          <p className="text-xs text-muted-foreground">{activeFocusSubtitle}</p>
+          <div className="text-2xl sm:text-3xl font-bold font-bernoru">{activeFocusPhase}</div>
+          <p className="text-[11px] sm:text-xs text-muted-foreground line-clamp-1">{activeFocusSubtitle}</p>
         </div>
       </div>
 
       {/* Main Content Rows */}
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-3">
         {/* Quote of the Day */}
-        <div className="md:col-span-2 rounded-xl border bg-card/80 backdrop-blur-md p-6 shadow-sm flex flex-col justify-between">
+        <div className="md:col-span-2 rounded-xl border bg-card/80 backdrop-blur-md p-4 sm:p-6 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-orange-500 mb-3">
               <Sparkles className="h-4 w-4" /> Quote of the Day
@@ -239,7 +242,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Account Summary */}
-        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-6 shadow-sm flex flex-col justify-between">
+        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-4 sm:p-6 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">
               <User className="h-4 w-4" /> Profile Details
@@ -297,9 +300,9 @@ export default async function DashboardPage() {
       </div>
 
       {/* Live Overview: Habits & Todos Breakdown */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         {/* Today's Habits Summary */}
-        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-6 shadow-sm flex flex-col justify-between">
+        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-4 sm:p-6 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -330,9 +333,9 @@ export default async function DashboardPage() {
                 {habits.slice(0, 4).map((h) => (
                   <div
                     key={h.id}
-                    className="flex items-center justify-between p-3 rounded-lg border bg-background/50 hover:bg-background/80 transition-colors"
+                    className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg border bg-background/50 hover:bg-background/80 transition-colors gap-2"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                       {h.completed_today ? (
                         <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                       ) : (
@@ -347,7 +350,7 @@ export default async function DashboardPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[11px] font-semibold text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="text-[10px] sm:text-[11px] font-semibold text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-full flex items-center gap-1">
                         <Flame className="h-3 w-3" />
                         {h.streak}d
                       </span>
@@ -373,7 +376,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Daily Todos Summary */}
-        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-6 shadow-sm flex flex-col justify-between">
+        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-4 sm:p-6 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -406,9 +409,9 @@ export default async function DashboardPage() {
                   return (
                     <div
                       key={t.id}
-                      className="flex items-center justify-between p-3 rounded-lg border bg-background/50 hover:bg-background/80 transition-colors"
+                      className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg border bg-background/50 hover:bg-background/80 transition-colors gap-2"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         {t.is_completed ? (
                           <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                         ) : (
@@ -422,11 +425,11 @@ export default async function DashboardPage() {
                           >
                             {t.title}
                           </span>
-                          <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-0.5">
                             {timing.createdFormatted && (
                               <span
                                 suppressHydrationWarning
-                                className="text-[10px] text-muted-foreground font-mono flex items-center gap-1"
+                                className="text-[9px] sm:text-[10px] text-muted-foreground font-mono flex items-center gap-1"
                               >
                                 <Clock className="h-2.5 w-2.5" />
                                 Created {timing.createdFormatted}
@@ -435,7 +438,7 @@ export default async function DashboardPage() {
                             {t.is_completed && timing.completedFormatted && (
                               <span
                                 suppressHydrationWarning
-                                className="text-[10px] text-muted-foreground font-mono flex items-center gap-1"
+                                className="text-[9px] sm:text-[10px] text-muted-foreground font-mono flex items-center gap-1"
                               >
                                 <CheckCircle2 className="h-2.5 w-2.5 text-emerald-500" />
                                 Done {timing.completedFormatted}
@@ -448,29 +451,29 @@ export default async function DashboardPage() {
                         {t.is_completed ? (
                           <span
                             className={cn(
-                              "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex items-center gap-1",
+                              "text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full border flex items-center gap-1",
                               timing.status === "okay"
                                 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                                 : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
                             )}
                           >
                             {timing.status === "okay" ? (
-                              <CheckCircle2 className="h-3 w-3" />
+                              <CheckCircle2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                             ) : (
-                              <Clock className="h-3 w-3" />
+                              <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                             )}
                             {timing.badgeLabel}
                           </span>
                         ) : (
                           <span
                             className={cn(
-                              "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex items-center gap-1",
+                              "text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full border flex items-center gap-1",
                               timing.status === "today"
                                 ? "bg-primary/10 text-primary border-primary/20"
                                 : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                             )}
                           >
-                            <Clock className="h-3 w-3" />
+                            <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                             {timing.status === "today" ? "Today" : "Overdue"}
                           </span>
                         )}

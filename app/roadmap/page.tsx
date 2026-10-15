@@ -179,19 +179,19 @@ export default function Roadmap() {
   return (
     <div className="min-h-screen flex flex-col text-foreground selection:bg-primary/10">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/60 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/60 backdrop-blur-md px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
+            className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
           >
             <div className="flex size-7 items-center justify-center rounded-md bg-muted group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
               <ArrowLeft className="size-4" />
             </div>
-            <span>Go back</span>
+            <span className="hidden xs:inline">Go back</span>
           </Link>
           <span className="text-muted-foreground/40">/</span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <Image
               src="/logo_transparent.png"
               alt="Day One"
@@ -209,33 +209,34 @@ export default function Roadmap() {
             variant="outline"
             size="sm"
             render={<Link href="/dashboard" className="flex items-center gap-1.5" />}
+            className="h-8 px-2.5 sm:px-3 text-xs"
           >
             <LayoutDashboard className="size-3.5" />
-            <span>Dashboard</span>
+            <span className="hidden xs:inline sm:inline">Dashboard</span>
           </Button>
         </div>
       </header>
 
       {/* Main Roadmap Container */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-10">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-3 sm:px-6 py-6 sm:py-12 space-y-8 sm:space-y-10 overflow-x-hidden">
         {/* Header Hero */}
-        <div className="space-y-4 text-center sm:text-left">
+        <div className="space-y-3 sm:space-y-4 text-center sm:text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20">
             <Sparkles className="size-3.5" />
             <span>The 100-Day Transformation</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold font-bernoru tracking-tight leading-[1.1]">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-bernoru tracking-tight leading-[1.15] break-words">
             THE PERSONAL JOURNEY
           </h1>
 
-          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl leading-relaxed">
+          <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed">
             Greatness isn&apos;t born from occasional heroics; it is forged by the small, quiet choices made day after day. Here is your blueprint from Day One to lifelong mastery.
           </p>
 
           {/* Progress Overview Bar */}
           <div className="pt-2">
-            <div className="flex items-center justify-between text-xs font-medium text-muted-foreground mb-2">
+            <div className="flex flex-col xs:flex-row xs:items-center justify-between text-xs font-medium text-muted-foreground mb-2 gap-1">
               <span>Overall Journey Progress</span>
               <span className="text-foreground font-semibold">Phase 2: Active Focus (Day 12 of 100)</span>
             </div>
@@ -248,12 +249,12 @@ export default function Roadmap() {
         </div>
 
         {/* Phase Filter Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b scrollbar-none">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 border-b no-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0">
           <button
             type="button"
             onClick={() => setActiveFilter("all")}
             className={cn(
-              "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer",
+              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer shrink-0",
               activeFilter === "all"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -267,7 +268,7 @@ export default function Roadmap() {
               type="button"
               onClick={() => setActiveFilter(phase.phaseNumber)}
               className={cn(
-                "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer",
+                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer shrink-0",
                 activeFilter === phase.phaseNumber
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -280,13 +281,13 @@ export default function Roadmap() {
         </div>
 
         {/* Phases Timeline List */}
-        <div className="space-y-12">
+        <div className="space-y-10 sm:space-y-12">
           {filteredPhases.map((phase) => {
             const isCompleted = phase.status === "completed"
             const isInProgress = phase.status === "in-progress"
 
             return (
-              <section key={phase.phaseNumber} className="relative pl-6 sm:pl-8 border-l-2 border-border space-y-6">
+              <section key={phase.phaseNumber} className="relative pl-6 sm:pl-8 ml-3 sm:ml-2 border-l-2 border-border space-y-5 sm:space-y-6">
                 {/* Timeline Node Dot */}
                 <div
                   className={cn(
@@ -306,7 +307,7 @@ export default function Roadmap() {
                   <div className="flex flex-wrap items-center gap-2">
                     <span
                       className={cn(
-                        "text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full",
+                        "text-[10px] sm:text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full",
                         isCompleted && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
                         isInProgress && "bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20",
                         phase.status === "upcoming" && "bg-muted text-muted-foreground border border-border"
@@ -317,61 +318,61 @@ export default function Roadmap() {
                     <span className="text-xs font-medium text-muted-foreground">Phase {phase.phaseNumber}</span>
                   </div>
 
-                  <h2 className="text-2xl sm:text-3xl font-bold font-bernoru tracking-tight">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-bernoru tracking-tight">
                     {phase.title}
                   </h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-2xl">
                     {phase.subtitle}
                   </p>
                 </div>
 
                 {/* Milestones Cards */}
-                <div className="grid gap-4 sm:gap-5">
+                <div className="grid gap-3.5 sm:gap-5">
                   {phase.milestones.map((milestone) => {
                     const Icon = milestone.icon
                     return (
                       <div
                         key={milestone.id}
                         className={cn(
-                          "rounded-xl border bg-card/75 backdrop-blur-sm p-5 shadow-sm transition-all hover:shadow-md hover:bg-card/90",
+                          "rounded-xl border bg-card/75 backdrop-blur-sm p-3.5 sm:p-5 shadow-sm transition-all hover:shadow-md hover:bg-card/90",
                           isInProgress && "border-orange-500/40 bg-card/85 ring-1 ring-orange-500/20"
                         )}
                       >
-                        <div className="flex items-start gap-3.5">
+                        <div className="flex items-start gap-3 sm:gap-3.5">
                           <div
                             className={cn(
-                              "p-2.5 rounded-lg shrink-0 mt-0.5",
+                              "p-2 sm:p-2.5 rounded-lg shrink-0 mt-0.5",
                               isCompleted && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
                               isInProgress && "bg-orange-500/10 text-orange-500",
                               phase.status === "upcoming" && "bg-muted text-muted-foreground"
                             )}
                           >
-                            <Icon className="size-5" />
+                            <Icon className="size-4 sm:size-5" />
                           </div>
 
-                          <div className="space-y-2 flex-1">
-                            <div className="flex items-center justify-between">
-                              <h3 className="text-base font-bold font-bernoru tracking-wide text-foreground">
+                          <div className="space-y-2 flex-1 min-w-0">
+                            <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-1">
+                              <h3 className="text-sm sm:text-base font-bold font-signika tracking-wide text-foreground leading-snug">
                                 {milestone.title}
                               </h3>
                               {isCompleted && (
-                                <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
+                                <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 shrink-0">
                                   <CheckCircle2 className="size-3.5" /> Done
                                 </span>
                               )}
                             </div>
 
-                            <p className="text-sm text-muted-foreground leading-relaxed">
+                            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                               {milestone.description}
                             </p>
 
                             {/* Practical Tip Pill */}
-                            <div className="rounded-lg bg-muted/60 border border-border/50 p-3 text-xs text-foreground/90 space-y-1">
-                              <div className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                            <div className="rounded-lg bg-muted/60 border border-border/50 p-2.5 sm:p-3 text-xs text-foreground/90 space-y-1">
+                              <div className="font-semibold text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
                                 <Zap className="size-3 text-orange-500" />
                                 <span>Action Rule:</span>
                               </div>
-                              <p className="text-muted-foreground leading-relaxed font-sans">
+                              <p className="text-xs text-muted-foreground leading-relaxed font-sans">
                                 {milestone.actionTip}
                               </p>
                             </div>
@@ -387,12 +388,12 @@ export default function Roadmap() {
         </div>
 
         {/* Closing Quote Banner */}
-        <div className="rounded-2xl border bg-card/60 backdrop-blur-sm p-6 sm:p-8 text-center space-y-3 relative overflow-hidden">
+        <div className="rounded-2xl border bg-card/60 backdrop-blur-sm p-5 sm:p-8 text-center space-y-2.5 sm:space-y-3 relative overflow-hidden">
           <div className="absolute inset-0 bg-radial-[circle_at_center,rgba(249,115,22,0.06),transparent_70%]" />
           <p className="text-xs font-semibold tracking-widest uppercase text-orange-500">
             Guiding Philosophy
           </p>
-          <blockquote className="text-lg sm:text-xl font-signika italic text-foreground max-w-xl mx-auto">
+          <blockquote className="text-base sm:text-xl font-signika italic text-foreground max-w-xl mx-auto">
             &ldquo;We are what we repeatedly do. Excellence, then, is not an act, but a habit.&rdquo;
           </blockquote>
           <p className="text-xs text-muted-foreground font-semibold">

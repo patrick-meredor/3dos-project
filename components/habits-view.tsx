@@ -274,47 +274,47 @@ create policy "Users can manage their own habits"
       )}
 
       {/* Hero Header & Metrics */}
-      <div className="flex flex-col gap-4 pb-2 border-b">
+      <div className="flex flex-col gap-3 sm:gap-4 pb-2 border-b">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold font-bernoru tracking-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-bernoru tracking-tight">
               MY HABITS
             </h1>
-            <p className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-orange-500" />
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-orange-500 shrink-0" />
               <span>Build unbroken streaks and master your daily non-negotiables.</span>
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-xs font-semibold flex items-center gap-1.5 border border-orange-500/20">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-xs font-semibold flex items-center gap-1.5 border border-orange-500/20">
               <Flame className="h-3.5 w-3.5 fill-orange-500" />
               <span>{maxStreak}d Best Streak</span>
             </span>
-            <span className="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold border border-emerald-500/20">
+            <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold border border-emerald-500/20">
               {totalCompletedToday}/{totalHabits} Done Today
             </span>
           </div>
         </div>
 
         {/* 7-Day Week Strip */}
-        <div className="flex items-center justify-between bg-card/60 border rounded-xl p-3 sm:p-4 text-xs">
-          <div className="flex items-center gap-2 text-muted-foreground font-medium">
-            <Calendar className="h-4 w-4 text-orange-500" />
+        <div className="flex items-center justify-between bg-card/60 border rounded-xl p-2.5 sm:p-4 text-xs gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground font-medium shrink-0">
+            <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-500" />
             <span className="hidden sm:inline">This Week&apos;s Momentum:</span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-3">
             {past7Days.map((day) => (
               <div
                 key={day.dateStr}
                 className={cn(
-                  "flex flex-col items-center justify-center size-8 sm:size-9 rounded-lg border transition-all text-center",
+                  "flex flex-col items-center justify-center size-7 xs:size-8 sm:size-9 rounded-md sm:rounded-lg border transition-all text-center",
                   day.isToday
                     ? "border-orange-500 bg-orange-500/15 font-bold text-orange-600 dark:text-orange-400 shadow-sm"
                     : "border-border/60 bg-muted/40 text-muted-foreground"
                 )}
               >
-                <span className="text-[10px] uppercase">{day.dayName}</span>
-                <span className="text-[11px] font-semibold">
+                <span className="text-[9px] xs:text-[10px] uppercase">{day.dayName}</span>
+                <span className="text-[10px] xs:text-[11px] font-semibold">
                   {day.dateStr.split("-")[2]}
                 </span>
               </div>
@@ -324,24 +324,25 @@ create policy "Users can manage their own habits"
       </div>
 
       {/* Add New Habit Form */}
-      <form onSubmit={handleAddHabit} className="rounded-xl border bg-card p-4 shadow-sm space-y-3">
+      <form onSubmit={handleAddHabit} className="rounded-xl border bg-card p-3.5 sm:p-4 shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row gap-2.5">
           <Input
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
-            placeholder="Add habit (e.g. 10m Meditation, Read 10 Pages, Cold Shower)..."
+            placeholder="Add habit (e.g. 10m Meditation, Read 10 Pages)..."
             className="flex-1 h-10 px-3.5 text-sm"
             disabled={isPending}
           />
-          <Button type="submit" disabled={isPending || !newTitle.trim()} className="gap-1.5 h-10 px-4 shrink-0">
+          <Button type="submit" disabled={isPending || !newTitle.trim()} className="gap-1.5 h-10 px-3 sm:px-4 shrink-0">
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-            <span>Add Habit</span>
+            <span className="hidden xs:inline sm:inline">Add Habit</span>
+            <span className="inline xs:hidden">Add</span>
           </Button>
         </div>
 
         {/* Category Picker */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-          <span className="text-muted-foreground mr-1 text-[11px] uppercase tracking-wider font-semibold">Category:</span>
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 text-xs no-scrollbar -mx-1 px-1">
+          <span className="text-muted-foreground mr-1 text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold shrink-0">Category:</span>
           {CATEGORIES.map((cat) => {
             const Icon = cat.icon
             const isSelected = selectedCategory === cat.name
@@ -351,7 +352,7 @@ create policy "Users can manage their own habits"
                 type="button"
                 onClick={() => setSelectedCategory(cat.name)}
                 className={cn(
-                  "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all cursor-pointer font-medium",
+                  "flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg border transition-all cursor-pointer font-medium shrink-0 text-xs",
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary shadow-xs"
                     : "bg-muted/50 text-muted-foreground border-border/60 hover:text-foreground"
@@ -366,12 +367,12 @@ create policy "Users can manage their own habits"
       </form>
 
       {/* Category Filter Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b text-xs">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b text-xs no-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0">
         <Button
           variant={activeCategoryFilter === "all" ? "default" : "ghost"}
           size="sm"
           onClick={() => setActiveCategoryFilter("all")}
-          className="text-xs h-7"
+          className="text-xs h-7 px-2.5 sm:px-3 shrink-0"
         >
           All ({habits.length})
         </Button>
@@ -383,7 +384,7 @@ create policy "Users can manage their own habits"
               variant={activeCategoryFilter === cat.name.toLowerCase() ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveCategoryFilter(cat.name.toLowerCase())}
-              className="text-xs h-7 gap-1.5"
+              className="text-xs h-7 gap-1.5 px-2.5 sm:px-3 shrink-0"
             >
               <span>{cat.name}</span>
               <span className="text-[10px] opacity-75">({count})</span>
@@ -422,12 +423,12 @@ create policy "Users can manage their own habits"
               <div
                 key={habit.id}
                 className={cn(
-                  "group relative flex flex-col justify-between p-4 rounded-xl border bg-card/85 backdrop-blur-sm shadow-sm transition-all hover:shadow-md",
+                  "group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-xl border bg-card/85 backdrop-blur-sm shadow-sm transition-all hover:shadow-md",
                   habit.completed_today && "border-orange-500/40 bg-card/95 ring-1 ring-orange-500/15"
                 )}
               >
                 {/* Top Row: Category Pill & Options */}
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-2.5 sm:mb-3">
                   <span
                     className={cn(
                       "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold border",
@@ -438,9 +439,9 @@ create policy "Users can manage their own habits"
                     <span>{habit.category}</span>
                   </span>
 
-                  {/* Edit/Delete Actions */}
+                  {/* Edit/Delete Actions: visible on mobile/touch, hover on desktop */}
                   {!isEditing && (
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                       <Button
                         variant="ghost"
                         size="icon-xs"
@@ -464,7 +465,7 @@ create policy "Users can manage their own habits"
                 </div>
 
                 {/* Middle: Title & Checkbox */}
-                <div className="flex items-start gap-3 mb-4 flex-1">
+                <div className="flex items-start gap-2.5 sm:gap-3 mb-3 sm:mb-4 flex-1">
                   <button
                     type="button"
                     onClick={() => handleToggleToday(habit)}
@@ -472,9 +473,9 @@ create policy "Users can manage their own habits"
                     aria-label={habit.completed_today ? "Completed today" : "Mark completed today"}
                   >
                     {habit.completed_today ? (
-                      <CheckCircle2 className="h-6 w-6 text-orange-500 fill-orange-500/20" />
+                      <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500 fill-orange-500/20" />
                     ) : (
-                      <Circle className="h-6 w-6 hover:text-orange-500" />
+                      <Circle className="h-5 w-5 sm:h-6 sm:w-6 hover:text-orange-500" />
                     )}
                   </button>
 
@@ -512,7 +513,7 @@ create policy "Users can manage their own habits"
                       <h3
                         onClick={() => handleToggleToday(habit)}
                         className={cn(
-                          "text-base font-bold font-bernoru tracking-wide cursor-pointer transition-colors leading-snug",
+                          "text-sm sm:text-base font-bold font-bernoru tracking-wide cursor-pointer transition-colors leading-snug break-words",
                           habit.completed_today ? "text-foreground" : "text-foreground/90"
                         )}
                       >
@@ -523,18 +524,18 @@ create policy "Users can manage their own habits"
                 </div>
 
                 {/* Bottom Row: Streak & 7-Day History Mini-Dots */}
-                <div className="flex items-center justify-between pt-3 border-t text-xs">
+                <div className="flex items-center justify-between pt-2.5 sm:pt-3 border-t text-xs">
                   <div className="flex items-center gap-1.5">
                     <Flame
                       className={cn(
-                        "h-4 w-4",
+                        "h-3.5 w-3.5 sm:h-4 sm:w-4",
                         habit.streak > 0 ? "text-orange-500 fill-orange-500" : "text-muted-foreground"
                       )}
                     />
-                    <span className="font-semibold text-foreground font-sans">
+                    <span className="font-semibold text-foreground font-sans text-xs">
                       {habit.streak} {habit.streak === 1 ? "day" : "days"}
                     </span>
-                    <span className="text-[11px] text-muted-foreground">streak</span>
+                    <span className="text-[10px] sm:text-[11px] text-muted-foreground">streak</span>
                   </div>
 
                   {/* 7-Day Mini Dots */}
