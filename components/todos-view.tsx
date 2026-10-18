@@ -253,7 +253,7 @@ create policy "Users can manage their own todos"
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3">
         <div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-bernoru tracking-tight">
             DAILY TODOS
@@ -284,7 +284,7 @@ create policy "Users can manage their own todos"
           className="flex-1 h-10 px-3.5 text-sm"
           disabled={isPending}
         />
-        <Button type="submit" disabled={isPending || !newTitle.trim()} className="gap-1.5 h-10 px-3 sm:px-4 shrink-0">
+        <Button variant="default" type="submit" disabled={isPending || !newTitle.trim()} className="gap-1.5 h-10 px-3 sm:px-4 shrink-0">
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
           <span className="hidden xs:inline sm:inline">Add Todo</span>
           <span className="inline xs:hidden">Add</span>
@@ -292,7 +292,7 @@ create policy "Users can manage their own todos"
       </form>
 
       {/* Filter Tabs */}
-      <div className="flex items-center justify-between border-b pb-2">
+      <div className="flex items-center justify-between pb-2">
         <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar">
           <Button
             variant={filter === "all" ? "default" : "ghost"}

@@ -45,12 +45,16 @@ export default async function HabitsLayout({
             <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4 hidden xs:block" />
             <Breadcrumb>
               <BreadcrumbList className="text-xs sm:text-sm">
+                <BreadcrumbItem className="hidden md:inline-flex">
+                  <BreadcrumbLink render={<Link href="/" />}>Home</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:inline-flex" />
                 <BreadcrumbItem className="hidden xs:inline-flex">
                   <BreadcrumbLink render={<Link href="/dashboard" />}>Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden xs:inline-flex" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>My Habits</BreadcrumbPage>
+                  <BreadcrumbPage>Habits</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>

@@ -103,13 +103,12 @@ export function AppSidebar({ user, habits = [], ...props }: AppSidebarProps) {
               render={<Link href="/dashboard" />}
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <div className="flex aspect-square size-8 items-center justify-center">
                 <Image
-                  src="/logo_transparent.png"
+                  src="/Day_One_Logo.png"
                   alt="Day One"
-                  width={24}
-                  height={24}
-                  className="dark:invert"
+                  width={35}
+                  height={35}
                 />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">

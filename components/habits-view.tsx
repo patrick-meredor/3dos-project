@@ -286,18 +286,18 @@ create policy "Users can manage their own habits"
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-xs font-semibold flex items-center gap-1.5 border border-orange-500/20">
+            <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 text-xs font-semibold flex items-center gap-1.5 border border-orange-500/20 backdrop-blur-md">
               <Flame className="h-3.5 w-3.5 fill-orange-500" />
               <span>{maxStreak}d Best Streak</span>
             </span>
-            <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold border border-emerald-500/20">
+            <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold border border-emerald-500/20 backdrop-blur-md">
               {totalCompletedToday}/{totalHabits} Done Today
             </span>
           </div>
         </div>
 
         {/* 7-Day Week Strip */}
-        <div className="flex items-center justify-between bg-card/60 border rounded-xl p-2.5 sm:p-4 text-xs gap-2">
+        <div className="flex items-center justify-between bg-card border backdrop-blur-md rounded-xl p-2.5 sm:p-4 text-xs gap-2">
           <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground font-medium shrink-0">
             <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-500" />
             <span className="hidden sm:inline">This Week&apos;s Momentum:</span>
@@ -324,7 +324,7 @@ create policy "Users can manage their own habits"
       </div>
 
       {/* Add New Habit Form */}
-      <form onSubmit={handleAddHabit} className="rounded-xl border bg-card p-3.5 sm:p-4 shadow-sm space-y-3">
+      <form onSubmit={handleAddHabit} className="rounded-xl border bg-card p-3.5 sm:p-4 shadow-sm space-y-3 backdrop-blur-md">
         <div className="flex flex-col sm:flex-row gap-2.5">
           <Input
             value={newTitle}
@@ -423,8 +423,8 @@ create policy "Users can manage their own habits"
               <div
                 key={habit.id}
                 className={cn(
-                  "group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-xl border bg-card/85 backdrop-blur-sm shadow-sm transition-all hover:shadow-md",
-                  habit.completed_today && "border-orange-500/40 bg-card/95 ring-1 ring-orange-500/15"
+                  "group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-xl border bg-card shadow-sm transition-all hover:shadow-md",
+                  habit.completed_today && "border-orange-500/40 bg-card ring-1 ring-orange-500/15"
                 )}
               >
                 {/* Top Row: Category Pill & Options */}
