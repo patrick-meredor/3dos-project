@@ -14,6 +14,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { signup } from "@/app/signup/action"
 import { signInWithGithub } from "@/app/login/action"
 
@@ -61,10 +62,9 @@ export function SignupForm({
 
         <Field>
           <FieldLabel htmlFor="password">Password</FieldLabel>
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             placeholder="At least 6 characters"
             autoComplete="new-password"
             required
@@ -74,10 +74,10 @@ export function SignupForm({
 
         <Field>
           <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-          <Input
+          <PasswordInput
             id="confirmPassword"
             name="confirmPassword"
-            type="password"
+            placeholder="Confirm your password"
             autoComplete="new-password"
             required
             disabled={isPending || isGithubPending}

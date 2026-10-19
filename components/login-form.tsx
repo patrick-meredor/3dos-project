@@ -14,6 +14,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { login, signInWithGithub } from "@/app/login/action"
 
 export function LoginForm({
@@ -55,17 +56,16 @@ export function LoginForm({
         <Field>
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Password</FieldLabel>
-            <a
-              href="#"
+            <Link
+              href="/forgot-password"
               className="ml-auto text-sm text-muted-foreground underline-offset-4 hover:underline hover:text-foreground"
             >
               Forgot your password?
-            </a>
+            </Link>
           </div>
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="current-password"
             required
             disabled={isPending || isGithubPending}

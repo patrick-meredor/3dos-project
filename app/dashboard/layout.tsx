@@ -38,7 +38,7 @@ export default async function DashboardLayout({
     <SidebarProvider>
       <AppSidebar user={user} habits={habits} />
       <SidebarInset>
-        <header className="flex h-14 sm:h-16 shrink-0 items-center justify-between border-b px-3 sm:px-4 transition-[width,height] ease-linear">
+        <header className="flex h-14 sm:h-16 shrink-0 items-center justify-between px-3 sm:px-4 transition-[width,height] ease-linear">
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             <SidebarTrigger className="-ml-1 size-8 sm:size-9" />
             <Breadcrumb>
