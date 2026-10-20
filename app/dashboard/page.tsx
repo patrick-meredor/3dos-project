@@ -2,6 +2,7 @@ import { createClient } from "@/lib/server"
 import { getHabits } from "@/app/habits/action"
 import { getLocalDateString } from "@/lib/habits"
 import { getTodos } from "@/app/todos/action"
+import { getJournalEntries } from "@/app/journal/action"
 import { quoteItems } from "@/lib/quotes"
 import {
   Flame,
@@ -17,6 +18,7 @@ import {
   List,
   Plus,
   Clock,
+  PenSquare,
 } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -33,10 +35,11 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Fetch real habits and todos concurrently
-  const [{ habits }, { todos }] = await Promise.all([
+  // Fetch real habits, todos, and journal entries concurrently
+  const [{ habits }, { todos }, { entries: journalEntries = [] }] = await Promise.all([
     getHabits(),
     getTodos(),
+    getJournalEntries(),
   ])
 
   const userName = user?.email ? user.email.split("@")[0] : "Hero"
@@ -121,18 +124,21 @@ export default async function DashboardPage() {
     actionsSubtitle = `${completedTodosCount} of ${todos.length} todo${todos.length === 1 ? "" : "s"} completed`
   }
 
-  // 4. ACTIVE FOCUS: Roadmap Journey Phase based on actual streak
-  let activeFocusPhase = "PHASE 1"
-  let activeFocusSubtitle = "Foundation & Commitment (Days 1–7)"
-  if (maxStreak >= 67) {
-    activeFocusPhase = "PHASE 4"
-    activeFocusSubtitle = "Mastery & Compounding (Day 67+)"
-  } else if (maxStreak >= 31) {
-    activeFocusPhase = "PHASE 3"
-    activeFocusSubtitle = "Automated Identity (Days 31–66)"
-  } else if (maxStreak >= 8) {
-    activeFocusPhase = "PHASE 2"
-    activeFocusSubtitle = "Crucible & Momentum (Days 8–30)"
+  // 4. JOURNAL ENTRIES: Total recorded journal entries & status
+  const journalEntriesCount = journalEntries.length
+  const wroteToday = journalEntries.some((e) => e.entry_date === todayStr)
+  const currentMonthPrefix = todayStr.slice(0, 7)
+  const entriesThisMonth = journalEntries.filter((e) => e.entry_date?.startsWith(currentMonthPrefix)).length
+
+  let journalSubtitle = "Capture your first reflection"
+  if (journalEntriesCount > 0) {
+    if (wroteToday) {
+      journalSubtitle = "Entry written today ✍️"
+    } else if (entriesThisMonth > 0) {
+      journalSubtitle = `${entriesThisMonth} written this month`
+    } else {
+      journalSubtitle = `${journalEntriesCount} reflection${journalEntriesCount === 1 ? "" : "s"} logged`
+    }
   }
 
   // Daily quote selection
@@ -205,17 +211,26 @@ export default async function DashboardPage() {
           <p className="text-[11px] sm:text-xs text-muted-foreground line-clamp-1">{actionsSubtitle}</p>
         </div>
 
-        {/* Active Focus */}
-        <div className="rounded-xl border bg-card/80 backdrop-blur-md p-3.5 sm:p-5 shadow-sm space-y-1.5 sm:space-y-2">
+        {/* Journal Entries */}
+        <Link
+          href="/journal"
+          className="rounded-xl border bg-card/80 backdrop-blur-md p-3.5 sm:p-5 shadow-sm space-y-1.5 sm:space-y-2 hover:border-purple-500/40 hover:bg-card/95 transition-all group cursor-pointer block"
+        >
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider">Active Focus</span>
-            <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 text-primary">
-              <Target className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wider group-hover:text-purple-500 transition-colors">
+              Journal Entries
+            </span>
+            <div className="p-1.5 sm:p-2 rounded-lg bg-purple-500/10 text-purple-500 group-hover:scale-105 transition-transform">
+              <PenSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-bold font-bernoru">{activeFocusPhase}</div>
-          <p className="text-[11px] sm:text-xs text-muted-foreground line-clamp-1">{activeFocusSubtitle}</p>
-        </div>
+          <div className="text-2xl sm:text-3xl font-bold font-bernoru">
+            {journalEntriesCount}
+          </div>
+          <p className="text-[11px] sm:text-xs text-muted-foreground line-clamp-1 group-hover:text-foreground transition-colors">
+            {journalSubtitle}
+          </p>
+        </Link>
       </div>
 
       {/* Main Content Rows */}
@@ -293,6 +308,13 @@ export default async function DashboardPage() {
               className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center justify-between"
             >
               <span>Activity Calendar</span>
+              <span>&rarr;</span>
+            </Link>
+            <Link
+              href="/journal"
+              className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center justify-between"
+            >
+              <span>Personal Journal</span>
               <span>&rarr;</span>
             </Link>
           </div>

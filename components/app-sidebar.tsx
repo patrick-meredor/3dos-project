@@ -18,6 +18,7 @@ import {
   Home,
   LogOut,
   Calendar,
+  BookText,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { HabitItem } from "@/app/habits/action"
@@ -84,6 +85,11 @@ export function AppSidebar({ user, habits = [], ...props }: AppSidebarProps) {
       url: "/calendar",
       icon: Calendar,
     },
+    {
+      title: "Journal",
+      url: "/journal",
+      icon: BookText,
+    }
   ]
 
   const displayHabits = habits.slice(0, 5)
