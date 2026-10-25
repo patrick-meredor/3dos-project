@@ -11,8 +11,68 @@ export interface JournalEntry {
   content: string
   entry_date: string // YYYY-MM-DD
   mood?: string // e.g. "Reflection", "Letter", "Thoughts", "Gratitude", "Idea"
+  is_draft?: boolean
   created_at?: string
   updated_at?: string
+}
+
+export interface JournalDraft {
+  id?: string
+  user_id?: string
+  entry_id?: string | null // populated if drafting an edit to an existing journal entry
+  title: string
+  content: string
+  entry_date: string
+  mood: string
+  updated_at: string
+}
+
+export function encodeDraftMood(mood: string, entryId?: string | null): string {
+  const cleanMood = mood || "Thoughts"
+  if (entryId) {
+    return `__draft__:edit:${entryId}:${cleanMood}`
+  }
+  return `__draft__:new:${cleanMood}`
+}
+
+export function parseDraftMood(rawMood?: string): {
+  cleanMood: string
+  isDraft: boolean
+  entryId: string | null
+} {
+  if (!rawMood) {
+    return { cleanMood: "Thoughts", isDraft: false, entryId: null }
+  }
+
+  if (rawMood.startsWith("__draft__:")) {
+    const rest = rawMood.slice("__draft__:".length)
+    if (rest.startsWith("edit:")) {
+      const parts = rest.split(":")
+      const entryId = parts[1] || null
+      const cleanMood = parts.slice(2).join(":") || "Thoughts"
+      return { cleanMood, isDraft: true, entryId }
+    }
+    if (rest.startsWith("new:")) {
+      const cleanMood = rest.slice("new:".length) || "Thoughts"
+      return { cleanMood, isDraft: true, entryId: null }
+    }
+    return { cleanMood: rest || "Thoughts", isDraft: true, entryId: null }
+  }
+
+  if (rawMood.startsWith("draft:")) {
+    const cleanMood = rawMood.slice("draft:".length) || "Thoughts"
+    return { cleanMood, isDraft: true, entryId: null }
+  }
+
+  return { cleanMood: rawMood, isDraft: false, entryId: null }
+}
+
+export function isDraftRecord(row: { mood?: string; is_draft?: boolean }): boolean {
+  if (row.is_draft === true) return true
+  if (typeof row.mood === "string" && (row.mood.startsWith("__draft__:") || row.mood.startsWith("draft:"))) {
+    return true
+  }
+  return false
 }
 
 export function formatJournalDate(dateStr?: string): {
