@@ -10,7 +10,7 @@ export interface JournalEntry {
   title: string
   content: string
   entry_date: string // YYYY-MM-DD
-  mood?: string // e.g. "Reflection", "Letter", "Thoughts", "Gratitude", "Idea"
+  mood?: string // e.g. "Reflection", "Letter", "Thoughts", "Gratitude", "Idea", "Learning"
   is_draft?: boolean
   created_at?: string
   updated_at?: string
