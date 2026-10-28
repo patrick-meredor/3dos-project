@@ -90,6 +90,12 @@ const CATEGORIES = [
     color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
     activeColor: "bg-emerald-500 text-white border-emerald-500",
   },
+  {
+    name: "Learning",
+    icon: BookOpen,
+    color: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20",
+    activeColor: "bg-indigo-500 text-white border-indigo-500",
+  }
 ]
 
 function getDraftStorageKey(userId?: string): string {

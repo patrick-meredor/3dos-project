@@ -8,6 +8,7 @@ export interface TodoItem {
   id: string
   user_id: string
   title: string
+  content?: string
   is_completed: boolean
   due_date?: string
   completed_at?: string
@@ -39,18 +40,19 @@ export async function getTodos(): Promise<{ todos: TodoItem[]; error?: string; t
   }
 
   // Normalize column names and dates (supports due_date, date, or created_at)
-  const normalizedTodos: TodoItem[] = (data || []).map((row: any) => {
+  const normalizedTodos: TodoItem[] = (data || []).map((row: Record<string, unknown>) => {
     const rawDate = row.due_date ?? row.date ?? row.created_at
     const dateFormatted = rawDate ? String(rawDate).split('T')[0] : undefined
 
     return {
       id: String(row.id),
-      user_id: row.user_id,
-      title: row.title ?? row.task ?? '',
+      user_id: String(row.user_id ?? ''),
+      title: String(row.title ?? row.task ?? ''),
+      content: String(row.content ?? row.description ?? row.details ?? ''),
       is_completed: Boolean(row.is_completed ?? row.completed ?? false),
       due_date: dateFormatted,
       completed_at: row.completed_at ? String(row.completed_at) : undefined,
-      created_at: row.created_at,
+      created_at: row.created_at ? String(row.created_at) : undefined,
     }
   })
 
@@ -59,12 +61,15 @@ export async function getTodos(): Promise<{ todos: TodoItem[]; error?: string; t
 
 export async function addTodo(
   title: string,
+  content?: string,
   dueDate?: string
 ): Promise<{ success: boolean; todo?: TodoItem; error?: string }> {
   const cleanTitle = title.trim()
   if (!cleanTitle) {
     return { success: false, error: 'Title cannot be empty.' }
   }
+
+  const cleanContent = (content ?? '').trim()
 
   const supabase = await createClient()
   const {
@@ -77,32 +82,36 @@ export async function addTodo(
 
   const targetDate = dueDate || getLocalDateString()
 
-  // Try insert with due_date and is_completed
-  let { data, error } = await supabase
-    .from('todos')
-    .insert([
-      {
-        user_id: user.id,
-        title: cleanTitle,
-        is_completed: false,
-        due_date: targetDate,
-      },
-    ])
-    .select()
-    .single()
+  // Try insert with title, content, is_completed, and due_date
+  const payload: Record<string, unknown> = {
+    user_id: user.id,
+    title: cleanTitle,
+    content: cleanContent,
+    is_completed: false,
+    due_date: targetDate,
+  }
 
-  // Graceful fallback if due_date column does not exist yet in table
+  let { data, error } = await supabase.from('todos').insert([payload]).select().single()
+
+  // Graceful fallback if 'content' column does not exist yet in table
+  if (error && error.message.includes('content')) {
+    delete payload.content
+    const retry = await supabase.from('todos').insert([payload]).select().single()
+    data = retry.data
+    error = retry.error
+  }
+
+  // Graceful fallback if due_date or is_completed columns do not exist yet in table
   if (error && (error.message.includes('due_date') || error.message.includes('is_completed'))) {
-    const payload: Record<string, any> = {
-      user_id: user.id,
-      title: cleanTitle,
-      is_completed: false,
+    delete payload.due_date
+    if (error.message.includes('is_completed')) {
+      delete payload.is_completed
+      payload.completed = false
     }
 
     let fallbackRes = await supabase.from('todos').insert([payload]).select().single()
-    if (fallbackRes.error && fallbackRes.error.message.includes('is_completed')) {
-      delete payload.is_completed
-      payload.completed = false
+    if (fallbackRes.error && fallbackRes.error.message.includes('content')) {
+      delete payload.content
       fallbackRes = await supabase.from('todos').insert([payload]).select().single()
     }
     data = fallbackRes.data
@@ -121,6 +130,7 @@ export async function addTodo(
       id: String(data.id),
       user_id: data.user_id,
       title: data.title ?? cleanTitle,
+      content: data.content ?? cleanContent,
       is_completed: false,
       due_date: data.due_date ? String(data.due_date).split('T')[0] : targetDate,
       completed_at: undefined,
@@ -133,6 +143,7 @@ export async function updateTodo(
   id: string,
   updates: {
     title?: string
+    content?: string
     is_completed?: boolean
     completed_at?: string | null
     due_date?: string
@@ -148,7 +159,7 @@ export async function updateTodo(
   }
 
   // Prevent editing completed todos
-  if (updates.title !== undefined || updates.due_date !== undefined) {
+  if (updates.title !== undefined || updates.content !== undefined || updates.due_date !== undefined) {
     const { data: existing } = await supabase
       .from('todos')
       .select('is_completed')
@@ -161,9 +172,12 @@ export async function updateTodo(
     }
   }
 
-  const payload: Record<string, any> = {}
+  const payload: Record<string, unknown> = {}
   if (updates.title !== undefined) {
     payload.title = updates.title.trim()
+  }
+  if (updates.content !== undefined) {
+    payload.content = updates.content.trim()
   }
   if (updates.is_completed !== undefined) {
     payload.is_completed = updates.is_completed
@@ -184,6 +198,17 @@ export async function updateTodo(
     .update(payload)
     .eq('id', id)
     .eq('user_id', user.id)
+
+  // Fallback if column content does not exist yet
+  if (error && payload.content !== undefined && error.message.includes('content')) {
+    delete payload.content
+    const fallback = await supabase
+      .from('todos')
+      .update(payload)
+      .eq('id', id)
+      .eq('user_id', user.id)
+    error = fallback.error
+  }
 
   // Fallback if column completed_at does not exist yet
   if (error && payload.completed_at !== undefined && error.message.includes('completed_at')) {
